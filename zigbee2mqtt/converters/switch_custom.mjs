@@ -549,192 +549,452 @@ const registerCustomClusters = (device) => {
   }
 };
 
-const definitions = [
-  {
-    zigbeeModel: ["TS0012-custom", "TS0042-CUSTOM"],
-    model: "TS0012_switch_module",
-    vendor: "Tuya-custom",
-    description:
-      "Custom switch (https://github.com/romasku/tuya-zigbee-switch)",
-    exposes: (device, options) => {
-      const dynExposes = [];
-      let config = !isDummyDevice(device)
-        ? device
-            .getEndpoint(1)
-            .getClusterAttributeValue("genBasic", "deviceConfig")
-        : null;
+const baseDefinition = {
+  vendor: "Tuya-custom",
+  description: "Custom switch (https://github.com/romasku/tuya-zigbee-switch)",
+  exposes: (device, options) => {
+    const dynExposes = [];
+    let config = !isDummyDevice(device)
+      ? device
+        .getEndpoint(1)
+        .getClusterAttributeValue("genBasic", "deviceConfig")
+      : null;
 
-      if (!config) {
-        return [customExposes.deviceConfig()];
-      }
+    if (!config) {
+      return [customExposes.deviceConfig()];
+    }
 
-      const deviceConfig = parseConfig(config);
+    const deviceConfig = parseConfig(config);
 
-      for (let i = 1; i <= deviceConfig.relayCount; i++) {
-        const switchExpose = e.switch(``).withEndpoint(`relay_${i}`);
-        // .withLabel cannot be used for this internal feature, so we need the following hack:
-        const state = switchExpose.features.find(f => f.name === 'state');
-        if (state) state.label = `Relay ${i} state`;
-        dynExposes.push(switchExpose);
-        dynExposes.push(
-          e
-            .power_on_behavior(["off", "on", "toggle", "previous"])
-            .withLabel(`Relay ${i} Power-on behavior`)
-            .withEndpoint(`relay_${i}`)
-        );
-      }
-      for (let i = 1; i <= deviceConfig.relayIndicatorCnt; i++) {
-        dynExposes.push(
-          customExposes.relayIndicator(i),
-          customExposes.relayIndicatorMode(i)
-        );
-      }
-      for (let i = 1; i <= deviceConfig.switchCount; i++) {
-        dynExposes.push(
-          customExposes.pressAction(i),
-          customExposes.switchMode(i),
-          customExposes.switchActions(i),
-          customExposes.relayMode(i),
-          customExposes.relayIndex(i, deviceConfig.relayCount),
-          customExposes.boundMode(i),
-          customExposes.longPressDuration(i),
-          customExposes.levelMoveRate(i)
-        );
-      }
-
-      if (deviceConfig.hasNetworkLed) {
-        dynExposes.push(customExposes.networkIndicator());
-      }
-      dynExposes.push(customExposes.deviceConfig());
-
-      return dynExposes;
-    },
-    endpoint: (device) => {
-      let config = !isDummyDevice(device)
-        ? device
-            .getEndpoint(1)
-            .getClusterAttributeValue("genBasic", "deviceConfig")
-        : null;
-
-      if (!config) {
-        return [];
-      }
-
-      const deviceConfig = parseConfig(config);
-
-      const res = {};
-      for (let i = 0; i < deviceConfig.switchCount; i++) {
-        res[`switch_${i + 1}`] = i + 1;
-      }
-      for (let i = 0; i < deviceConfig.relayCount; i++) {
-        res[`relay_${i + 1}`] = deviceConfig.switchCount + i + 1;
-      }
-      res["main"] = 1;
-      return res;
-    },
-
-    toZigbee: [
-      tz.on_off,
-      tz.power_on_behavior,
-      ...Object.values(customToZigbee),
-    ],
-    fromZigbee: [
-      fz.on_off,
-      fz.power_on_behavior,
-      ...Object.values(customFromZigbee),
-    ],
-
-    extend: [],
-    meta: { multiEndpoint: true },
-    onEvent: (event, _, device) => {
-      // There is change in API here, so this code checks for both cases
-      if (event === "start") {
-        registerCustomClusters(device);
-      }
-      if (event.type === "start") {
-        registerCustomClusters(event.data.device);
-      }
-    },
-    configure: async (device, coordinatorEndpoint, definition) => {
-      registerCustomClusters(device);
-
-      const mainEp = device.getEndpoint(1);
-      await mainEp.read("genBasic", ["deviceConfig"]);
-
-      let config = mainEp.getClusterAttributeValue("genBasic", "deviceConfig");
-
-      logger.debug(`Read config ${config} during configure`, NS);
-
-      const deviceConfig = parseConfig(config);
-
-      logger.debug(
-        `Parsed config as ${JSON.stringify(deviceConfig)} during configure`,
-        NS
+    for (let i = 1; i <= deviceConfig.relayCount; i++) {
+      const switchExpose = e.switch(``).withEndpoint(`relay_${i}`);
+      // .withLabel cannot be used for this internal feature, so we need the following hack:
+      const state = switchExpose.features.find(f => f.name === 'state');
+      if (state) state.label = `Relay ${i} state`;
+      dynExposes.push(switchExpose);
+      dynExposes.push(
+        e
+          .power_on_behavior(["off", "on", "toggle", "previous"])
+          .withLabel(`Relay ${i} Power-on behavior`)
+          .withEndpoint(`relay_${i}`)
       );
+    }
+    for (let i = 1; i <= deviceConfig.relayIndicatorCnt; i++) {
+      dynExposes.push(
+        customExposes.relayIndicator(i),
+        customExposes.relayIndicatorMode(i)
+      );
+    }
+    for (let i = 1; i <= deviceConfig.switchCount; i++) {
+      dynExposes.push(
+        customExposes.pressAction(i),
+        customExposes.switchMode(i),
+        customExposes.switchActions(i),
+        customExposes.relayMode(i),
+        customExposes.relayIndex(i, deviceConfig.relayCount),
+        customExposes.boundMode(i),
+        customExposes.longPressDuration(i),
+        customExposes.levelMoveRate(i)
+      );
+    }
 
-      if (deviceConfig.hasNetworkLed) {
-        await setupAttributes(
-          mainEp,
-          coordinatorEndpoint,
-          "genBasic",
-          [{ attribute: "networkLed", min: -1, max: -1, change: -1 }],
-          false
-        );
-      }
+    if (deviceConfig.hasNetworkLed) {
+      dynExposes.push(customExposes.networkIndicator());
+    }
+    dynExposes.push(customExposes.deviceConfig());
 
-      for (let i = 1; i <= deviceConfig.relayCount; i++) {
-        const relayEp = device.getEndpoint(deviceConfig.switchCount + i);
-        await setupAttributes(relayEp, coordinatorEndpoint, "genOnOff", [
-          { min: 0, max: 60, change: 1, attribute: "onOff" },
-        ]);
-        await setupAttributes(
-          relayEp,
-          coordinatorEndpoint,
-          "genOnOff",
-          [{ attribute: "startUpOnOff", min: -1, max: -1, change: -1 }],
-          false
-        );
-      }
-      for (let i = 1; i <= deviceConfig.relayIndicatorCnt; i++) {
-        const indEp = device.getEndpoint(deviceConfig.switchCount + i);
-        await setupAttributes(
-          indEp,
-          coordinatorEndpoint,
-          "genOnOff",
-          [
-            { attribute: "relayIndicator", min: -1, max: -1, change: -1 },
-            { attribute: "relayIndicatorMode", min: -1, max: -1, change: -1 },
-          ],
-          false
-        );
-      }
-      for (let i = 1; i <= deviceConfig.switchCount; i++) {
-        const switchEp = device.getEndpoint(i);
-        await setupAttributes(
-          switchEp,
-          coordinatorEndpoint,
-          "genOnOffSwitchCfg",
-          [
-            { attribute: "switchActions", min: -1, max: -1, change: -1 },
-            { attribute: "switchMode", min: -1, max: -1, change: -1 },
-            { attribute: "relayMode", min: -1, max: -1, change: -1 },
-            { attribute: "relayIndex", min: -1, max: -1, change: -1 },
-            { attribute: "longPressDuration", min: -1, max: -1, change: -1 },
-            { attribute: "levelMoveRate", min: -1, max: -1, change: -1 },
-            { attribute: "boundMode", min: -1, max: -1, change: -1 },
-          ],
-          false
-        );
-        await setupAttributes(
-          switchEp,
-          coordinatorEndpoint,
-          "genMultistateInput",
-          [{ min: 0, max: 60, change: 1, attribute: "presentValue" }]
-        );
-      }
-    },
-    ota: true,
+    return dynExposes;
   },
-];
+  endpoint: (device) => {
+    let config = !isDummyDevice(device)
+      ? device
+        .getEndpoint(1)
+        .getClusterAttributeValue("genBasic", "deviceConfig")
+      : null;
+
+    if (!config) {
+      return [];
+    }
+
+    const deviceConfig = parseConfig(config);
+
+    const res = {};
+    for (let i = 0; i < deviceConfig.switchCount; i++) {
+      res[`switch_${i + 1}`] = i + 1;
+    }
+    for (let i = 0; i < deviceConfig.relayCount; i++) {
+      res[`relay_${i + 1}`] = deviceConfig.switchCount + i + 1;
+    }
+    res["main"] = 1;
+    return res;
+  },
+
+  toZigbee: [
+    tz.on_off,
+    tz.power_on_behavior,
+    ...Object.values(customToZigbee),
+  ],
+  fromZigbee: [
+    fz.on_off,
+    fz.power_on_behavior,
+    ...Object.values(customFromZigbee),
+  ],
+
+  extend: [],
+  meta: { multiEndpoint: true },
+  onEvent: (event, _, device) => {
+    // There is change in API here, so this code checks for both cases
+    if (event === "start") {
+      registerCustomClusters(device);
+    }
+    if (event.type === "start") {
+      registerCustomClusters(event.data.device);
+    }
+  },
+  configure: async (device, coordinatorEndpoint, definition) => {
+    registerCustomClusters(device);
+
+    definition.model = "some_model";
+    definition.icon = "http://google.com";
+
+    const mainEp = device.getEndpoint(1);
+    await mainEp.read("genBasic", ["deviceConfig"]);
+
+    let config = mainEp.getClusterAttributeValue("genBasic", "deviceConfig");
+
+    logger.debug(`Read config ${config} during configure`, NS);
+
+    const deviceConfig = parseConfig(config);
+
+    logger.debug(
+      `Parsed config as ${JSON.stringify(deviceConfig)} during configure`,
+      NS
+    );
+
+    if (deviceConfig.hasNetworkLed) {
+      await setupAttributes(
+        mainEp,
+        coordinatorEndpoint,
+        "genBasic",
+        [{ attribute: "networkLed", min: -1, max: -1, change: -1 }],
+        false
+      );
+    }
+
+    for (let i = 1; i <= deviceConfig.relayCount; i++) {
+      const relayEp = device.getEndpoint(deviceConfig.switchCount + i);
+      await setupAttributes(relayEp, coordinatorEndpoint, "genOnOff", [
+        { min: 0, max: 60, change: 1, attribute: "onOff" },
+      ]);
+      await setupAttributes(
+        relayEp,
+        coordinatorEndpoint,
+        "genOnOff",
+        [{ attribute: "startUpOnOff", min: -1, max: -1, change: -1 }],
+        false
+      );
+    }
+    for (let i = 1; i <= deviceConfig.relayIndicatorCnt; i++) {
+      const indEp = device.getEndpoint(deviceConfig.switchCount + i);
+      await setupAttributes(
+        indEp,
+        coordinatorEndpoint,
+        "genOnOff",
+        [
+          { attribute: "relayIndicator", min: -1, max: -1, change: -1 },
+          { attribute: "relayIndicatorMode", min: -1, max: -1, change: -1 },
+        ],
+        false
+      );
+    }
+    for (let i = 1; i <= deviceConfig.switchCount; i++) {
+      const switchEp = device.getEndpoint(i);
+      await setupAttributes(
+        switchEp,
+        coordinatorEndpoint,
+        "genOnOffSwitchCfg",
+        [
+          { attribute: "switchActions", min: -1, max: -1, change: -1 },
+          { attribute: "switchMode", min: -1, max: -1, change: -1 },
+          { attribute: "relayMode", min: -1, max: -1, change: -1 },
+          { attribute: "relayIndex", min: -1, max: -1, change: -1 },
+          { attribute: "longPressDuration", min: -1, max: -1, change: -1 },
+          { attribute: "levelMoveRate", min: -1, max: -1, change: -1 },
+          { attribute: "boundMode", min: -1, max: -1, change: -1 },
+        ],
+        false
+      );
+      await setupAttributes(
+        switchEp,
+        coordinatorEndpoint,
+        "genMultistateInput",
+        [{ min: 0, max: 60, change: 1, attribute: "presentValue" }]
+      );
+    }
+  },
+  ota: true,
+}
+
+const MODELS = [ 
+    {
+        zigbeeModel: [
+            "TS0012-custom",
+            "TS0042-CUSTOM",
+        ],
+        model: "TS0012_switch_module",
+    },
+    {
+        zigbeeModel: [
+            "TS0012-custom-end-device",
+            "TS0042-CUSTOM",
+        ],
+        model: "TS0012_switch_module",
+    },
+    {
+        zigbeeModel: [
+            "WHD02-custom",
+        ],
+        model: "WHD02",
+    },
+    {
+        zigbeeModel: [
+            "TS0002-custom",
+        ],
+        model: "TS0002_basic",
+    },
+    {
+        zigbeeModel: [
+            "TS0002-OXT-CUS",
+        ],
+        model: "TS0002_basic",
+    },
+    {
+        zigbeeModel: [
+            "TS0011-custom",
+        ],
+        model: "TS0011_switch_module",
+    },
+    {
+        zigbeeModel: [
+            "TS0011-custom",
+        ],
+        model: "TS0011_switch_module",
+    },
+    {
+        zigbeeModel: [
+            "TS0001-custom",
+        ],
+        model: "TS0001_switch_module",
+    },
+    {
+        zigbeeModel: [
+            "TS0002-custom",
+        ],
+        model: "TS0002_basic",
+    },
+    {
+        zigbeeModel: [
+            "TS0001-AVB",
+            "TS0001-Avatto-custom",
+            "TS0001-AV-CUS",
+        ],
+        model: "TS0001_switch_module",
+    },
+    {
+        zigbeeModel: [
+            "TS0002-AVB",
+            "TS0002-Avatto-custom",
+            "TS0002-AV-CUS",
+        ],
+        model: "TS0002_limited",
+    },
+    {
+        zigbeeModel: [
+            "TS0003-AVB",
+            "TS0003-Avatto-custom",
+            "TS0003-AV-CUS",
+        ],
+        model: "TS0003_switch_module_2",
+    },
+    {
+        zigbeeModel: [
+            "TS0004-AVB",
+            "TS0004-Avatto-custom",
+            "TS0004-AV-CUS",
+        ],
+        model: "TS0004_switch_module_2",
+    },
+    {
+        zigbeeModel: [
+            "Moes-2-gang",
+        ],
+        model: "TS0012",
+    },
+    {
+        zigbeeModel: [
+            "Moes-2-gang-ED",
+        ],
+        model: "TS0012",
+    },
+    {
+        zigbeeModel: [
+            "Bseed-2-gang",
+        ],
+        model: "TS0012",
+    },
+    {
+        zigbeeModel: [
+            "Bseed-2-gang-ED",
+        ],
+        model: "TS0012",
+    },
+    {
+        zigbeeModel: [
+            "Bseed-2-gang-2",
+        ],
+        model: "TS0012",
+    },
+    {
+        zigbeeModel: [
+            "Bseed-2-gang-2-ED",
+        ],
+        model: "TS0012",
+    },
+    {
+        zigbeeModel: [
+            "TS0012-avatto",
+        ],
+        model: "TS0012_switch_module",
+    },
+    {
+        zigbeeModel: [
+            "TS0012-avatto-ED",
+        ],
+        model: "TS0012_switch_module",
+    },
+    {
+        zigbeeModel: [
+            "WHD02-Aubess",
+        ],
+        model: "WHD02",
+    },
+    {
+        zigbeeModel: [
+            "WHD02-Aubess-ED",
+        ],
+        model: "WHD02",
+    },
+    {
+        zigbeeModel: [
+            "Moes-1-gang",
+        ],
+        model: "ZS-EUB_1gang",
+    },
+    {
+        zigbeeModel: [
+            "Moes-1-gang-ED",
+        ],
+        model: "ZS-EUB_1gang",
+    },
+    {
+        zigbeeModel: [
+            "Moes-3-gang",
+        ],
+        model: "TS0013",
+    },
+    {
+        zigbeeModel: [
+            "Moes-3-gang-ED",
+        ],
+        model: "TS0013",
+    },
+    {
+        zigbeeModel: [
+            "WHD02-custom",
+        ],
+        model: "WHD02",
+    },
+    {
+        zigbeeModel: [
+            "WHD02-custom",
+        ],
+        model: "WHD02",
+    },
+    {
+        zigbeeModel: [
+            "Zemi-2-gang",
+        ],
+        model: "TS0012",
+    },
+    {
+        zigbeeModel: [
+            "Zemi-2-gang-ED",
+        ],
+        model: "TS0012",
+    },
+    {
+        zigbeeModel: [
+            "TS0011-avatto",
+        ],
+        model: "LZWSM16-1",
+    },
+    {
+        zigbeeModel: [
+            "TS0011-avatto-ED",
+        ],
+        model: "LZWSM16-1",
+    },
+    {
+        zigbeeModel: [
+            "TS0003-custom",
+        ],
+        model: "TS0003",
+    },
+    {
+        zigbeeModel: [
+            "TS0003-IHS",
+            "TS0003-3CH-cus",
+        ],
+        model: "TS0003_switch_module_2",
+    },
+    {
+        zigbeeModel: [
+            "TS0004-IHS",
+        ],
+        model: "TS0004_switch_module_2",
+    },
+    {
+        zigbeeModel: [
+            "ZB08-custom",
+        ],
+        model: "TS0013_switch_module",
+    },
+    {
+        zigbeeModel: [
+            "ZB08-custom-ED",
+        ],
+        model: "TS0013_switch_module",
+    },
+    {
+        zigbeeModel: [
+            "TS0004-Avv",
+        ],
+        model: "TS0004_switch_module",
+    },
+    {
+        zigbeeModel: [
+            "TS0004-custom",
+        ],
+        model: "TS0004_switch_module",
+    },
+    {
+        zigbeeModel: [
+            "Avatto-3-touch",
+        ],
+        model: "TS0003_switch_3_gang",
+    },
+]
+
+const definitions = MODELS.map((model) => ({...model, ...baseDefinition}));
 
 export default definitions;
