@@ -11,7 +11,6 @@
 
 typedef struct
 {
-  // u8  mode;
   u8  action;
   u8  relay_mode;
   u8  relay_index;
@@ -24,7 +23,6 @@ typedef struct
 {
   u8            switch_idx;
   u8            endpoint;
-  // u8            mode;
   u8            action;
   u8            relay_mode;
   u8            relay_index;
