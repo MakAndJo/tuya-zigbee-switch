@@ -26,13 +26,13 @@
 #define ZCL_ONOFF_CONFIGURATION_SWITCH_ACTION_ONOFF                 0x00
 #define ZCL_ONOFF_CONFIGURATION_SWITCH_ACTION_OFFON                 0x01
 #define ZCL_ONOFF_CONFIGURATION_SWITCH_ACTION_TOGGLE_SIMPLE         0x02
-#define ZCL_ONOFF_CONFIGURATION_SWITCH_ACTION_TOGGLE_SMART_SYNC     0x03 // this our
-#define ZCL_ONOFF_CONFIGURATION_SWITCH_ACTION_TOGGLE_SMART_OPPOSITE 0x04 // this our
+#define ZCL_ONOFF_CONFIGURATION_SWITCH_ACTION_TOGGLE_SMART_SYNC     0x03 // used on binding
+#define ZCL_ONOFF_CONFIGURATION_SWITCH_ACTION_TOGGLE_SMART_OPPOSITE 0x04 // this on binding (reverse)
 
-#define ZCL_ONOFF_CONFIGURATION_RELAY_MODE_DETACHED                 0x00
-#define ZCL_ONOFF_CONFIGURATION_RELAY_MODE_RISE                     0x01
-#define ZCL_ONOFF_CONFIGURATION_RELAY_MODE_LONG                     0x02
-#define ZCL_ONOFF_CONFIGURATION_RELAY_MODE_SHORT                    0x03
+#define ZCL_ONOFF_CONFIGURATION_RELAY_MODE_DETACHED                 0x00 // switch is detached from relay
+#define ZCL_ONOFF_CONFIGURATION_RELAY_MODE_RISE                     0x01 // not waiting (press -> on)
+#define ZCL_ONOFF_CONFIGURATION_RELAY_MODE_LONG                     0x02 // waiting for long press (press -> release -> on)
+#define ZCL_ONOFF_CONFIGURATION_RELAY_MODE_SHORT                    0x03 // waiting for short press (press -> release -> on)
 
 #define ZCL_ONOFF_CONFIGURATION_BINDED_MODE_RISE                     0x01
 #define ZCL_ONOFF_CONFIGURATION_BINDED_MODE_LONG                     0x02
