@@ -56,7 +56,7 @@ BOARD_TO_MANUFACTURER_NAMES = {
         '_TZ3000_fbjdkph9',
         'Tuya-TS0002-custom',
     ],
-    
+
 }
 
 
@@ -66,12 +66,12 @@ def make_ota_index_entry(file: Path, base_url: str, manufacturer_names: list[str
         "fileName": file.name,
         "fileVersion": int.from_bytes(data[14:18], "little"),
         "fileSize": len(data),
-        
+
         "url": f"{base_url}/{file}",
         "imageType": int.from_bytes(data[12:14], "little"),
         "manufacturerCode": int.from_bytes(data[10:12], "little"),
         "sha512": hashlib.sha512(data).hexdigest(),
-        "otaHeaderString": data[20:52].decode('unicode_escape'), 
+        "otaHeaderString": data[20:52].decode('unicode_escape'),
     }
     if manufacturer_names:
         res["manufacturerName"] = manufacturer_names
@@ -82,6 +82,9 @@ def get_raw_github_link():
         ["git", "remote", "get-url", "origin"],
         capture_output=True, text=True, check=True
     ).stdout.strip()
+
+    if remote_url.endswith(".git"):
+        remote_url = remote_url[:-4]
 
     branch = subprocess.run(
         ["git", "branch", "--show-current"],
@@ -95,13 +98,13 @@ if __name__ == "__main__":
         epilog="Reads a zigbee image file and updates index.json")
     parser.add_argument("filename", metavar="INPUT", type=str, help="OTA filename")
     parser.add_argument("index_file", type=str, help="OTA index.json file")
-    parser.add_argument("--base-url", required=False, help="Base url to use", 
+    parser.add_argument("--base-url", required=False, help="Base url to use",
                         default=get_raw_github_link())
     parser.add_argument(
         "--db_file", metavar="INPUT", type=str, help="File with device db"
     )
     parser.add_argument("--board", required=False, help="Used to select manufacturerName list to avoid flashing wrong devices")
-  
+
 
     args = parser.parse_args()
 
@@ -132,9 +135,9 @@ if __name__ == "__main__":
         it for it in index_data if
         (
             it.get("manufacturerName") != entry.get("manufacturerName")
-            or it["manufacturerCode"] != entry["manufacturerCode"]    
+            or it["manufacturerCode"] != entry["manufacturerCode"]
             or it["imageType"] != entry["imageType"]
-        ) 
+        )
     ]
     index_data.append(entry)
     index_file.write_text(json.dumps(
