@@ -18,9 +18,9 @@
 set -e                                           # Exit on error.
 cd "$(dirname "$(dirname "$(realpath "$0")")")"  # Go to project root.
 
-DEVICE=TS0004_AVATTO  # Change this to your device
+DEVICE=TS0012  # Change this to your device
 BOARD=$DEVICE make clean && BOARD=$DEVICE DEBUG=1 make -j16
 
-make update_converters
-make update_zha_quirk
-make update_supported_devices
+# make update_converters
+# make update_zha_quirk
+# make update_supported_devices
