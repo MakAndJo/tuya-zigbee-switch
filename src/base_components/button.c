@@ -11,7 +11,7 @@ void btn_init(button_t *button)
 {
   // During device startup, button may be already pressed, but this should not be detected
   // as user press. So, to avoid such situation, special init is required.
-  u8 state = drv_gpio_read(button->pin);
+  u8 state = !drv_gpio_read(button->pin);
   if (!state) {
      button->pressed = true;
      button->long_pressed = true;
@@ -20,7 +20,7 @@ void btn_init(button_t *button)
 
 void btn_update(button_t *button)
 {
-  u8 state = drv_gpio_read(button->pin);
+  u8 state = !drv_gpio_read(button->pin);
 
   if (btn_debounce(button, state))
   {
