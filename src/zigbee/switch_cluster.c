@@ -248,7 +248,7 @@ void switch_cluster_on_button_press(zigbee_switch_cluster *cluster)
 {
   // zigbee_relay_cluster *relay_cluster = &relay_clusters[cluster->relay_index - 1];
 
-  if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE) {
+  if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE || cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE_INVERSE) {
     // Toggle does not support modes (RISE, SHORT, LONG)
     if (cluster->relay_mode != ZCL_ONOFF_CONFIGURATION_RELAY_MODE_DETACHED) {
       switch_cluster_relay_action_on(cluster);
@@ -273,7 +273,7 @@ void switch_cluster_on_button_release(zigbee_switch_cluster *cluster)
 {
   // zigbee_relay_cluster *relay_cluster = &relay_clusters[cluster->relay_index - 1];
 
-  if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE) {
+  if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE || cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE_INVERSE) {
     // Toggle does not support modes (RISE, SHORT, LONG)
     if (cluster->relay_mode != ZCL_ONOFF_CONFIGURATION_RELAY_MODE_DETACHED) {
        switch_cluster_relay_action_off(cluster);
@@ -297,7 +297,8 @@ void switch_cluster_on_button_release(zigbee_switch_cluster *cluster)
 
 void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster)
 {
-  if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE)
+  if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE ||
+      cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE_INVERSE)
   {
     // Toggle does not support modes (RISE, SHORT, LONG)
     return;
@@ -317,8 +318,6 @@ void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster)
   cluster->multistate_state = MULTISTATE_LONG_PRESS;
   switch_cluster_report_action(cluster);
 }
-
-/// --- FACTORY RESET --- ///
 
 void switch_cluster_on_button_multi_press(zigbee_switch_cluster *cluster, u8 press_count)
 {
