@@ -15,10 +15,10 @@
 set -e                                           # Exit on error.
 cd "$(dirname "$(dirname "$(realpath "$0")")")"  # Go to project root.
 
-echo [] > zigbee2mqtt/ota/index_router.json 
-echo [] > zigbee2mqtt/ota/index_end_device.json 
-echo [] > zigbee2mqtt/ota/index_router-FORCE.json 
-echo [] > zigbee2mqtt/ota/index_end_device-FORCE.json 
+echo [] > zigbee2mqtt/ota/index_router.json
+echo [] > zigbee2mqtt/ota/index_end_device.json
+echo [] > zigbee2mqtt/ota/index_router-FORCE.json
+echo [] > zigbee2mqtt/ota/index_end_device-FORCE.json
 
 yq -r 'to_entries | sort_by(.key)[] | "\(.key) \(.value.device_type)"' device_db.yaml | while read ITER TYPE; do
   # Always build router firmware
@@ -30,6 +30,6 @@ yq -r 'to_entries | sort_by(.key)[] | "\(.key) \(.value.device_type)"' device_db
   fi
 done
 
-make update_converters
-make update_zha_quirk
-make update_supported_devices
+# make update_converters
+# make update_zha_quirk
+# make update_supported_devices
