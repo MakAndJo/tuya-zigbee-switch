@@ -75,8 +75,6 @@ $(BUILD_PATH)/zigbee/zcl/general/zcl_group.o \
 $(BUILD_PATH)/zigbee/zcl/general/zcl_group_attr.o \
 $(BUILD_PATH)/zigbee/zcl/general/zcl_identify.o \
 $(BUILD_PATH)/zigbee/zcl/general/zcl_identify_attr.o \
-$(BUILD_PATH)/zigbee/zcl/general/zcl_level.o \
-$(BUILD_PATH)/zigbee/zcl/general/zcl_level_attr.o \
 $(BUILD_PATH)/zigbee/zcl/general/zcl_multistate_input.o \
 $(BUILD_PATH)/zigbee/zcl/general/zcl_multistate_input_attr.o \
 $(BUILD_PATH)/zigbee/zcl/general/zcl_multistate_output.o \

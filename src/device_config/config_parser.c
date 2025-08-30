@@ -36,7 +36,6 @@ zigbee_basic_cluster basic_cluster =
 
 zigbee_group_cluster group_cluster = {};
 
-move_t level_move[4];
 zigbee_switch_cluster switch_clusters[4];
 u8 switch_clusters_cnt = 0;
 
@@ -90,7 +89,7 @@ void parse_config()
   char *entry;
   for (entry = extractNextEntry(&cursor); *entry != '\0'; entry = extractNextEntry(&cursor))
   {
-    if (entry[0] == 'B')
+    if (entry[0] == 'B') // internal button (reset)
     {
       GPIO_PinTypeDef  pin  = parsePin(entry + 1);
       GPIO_PullTypeDef pull = parsePullUpDown(entry + 3);
@@ -102,7 +101,7 @@ void parse_config()
       buttons[buttons_cnt].on_long_press           = onResetClicked;
       buttons_cnt++;
     }
-    else if (entry[0] == 'L')
+    else if (entry[0] == 'L') // internal led
     {
       GPIO_PinTypeDef pin = parsePin(entry + 1);
       init_gpio_output(pin);
@@ -118,7 +117,7 @@ void parse_config()
       has_dedicated_status_led = true;
       leds_cnt++;
     }
-    else if (entry[0] == 'I')
+    else if (entry[0] == 'I') // external led (indicator)
     {
       GPIO_PinTypeDef pin = parsePin(entry + 1);
       init_gpio_output(pin);
@@ -148,7 +147,7 @@ void parse_config()
       }
       leds_cnt++;
     }
-    else if (entry[0] == 'S')
+    else if (entry[0] == 'S') // external button (switch)
     {
       GPIO_PinTypeDef  pin  = parsePin(entry + 1);
       GPIO_PullTypeDef pull = parsePullUpDown(entry + 3);
@@ -158,12 +157,6 @@ void parse_config()
       buttons[buttons_cnt].long_press_duration_ms  = 800;
       buttons[buttons_cnt].multi_press_duration_ms = 800;
 
-      level_move[switch_clusters_cnt].moveMode = LEVEL_MOVE_UP,
-      level_move[switch_clusters_cnt].rate = 50,
-      level_move[switch_clusters_cnt].optPresent = 0,
-      level_move[switch_clusters_cnt].optionsMask = 0,
-      level_move[switch_clusters_cnt].optionsOverride = 0,
-
       switch_clusters[switch_clusters_cnt].switch_idx  = switch_clusters_cnt;
       switch_clusters[switch_clusters_cnt].mode        = ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_TOGGLE;
       switch_clusters[switch_clusters_cnt].action      = ZCL_ONOFF_CONFIGURATION_SWITCH_ACTION_TOGGLE_SIMPLE;
@@ -171,12 +164,11 @@ void parse_config()
       switch_clusters[switch_clusters_cnt].binded_mode = ZCL_ONOFF_CONFIGURATION_BINDED_MODE_SHORT;
       switch_clusters[switch_clusters_cnt].relay_index = switch_clusters_cnt + 1;
       switch_clusters[switch_clusters_cnt].button      = &buttons[buttons_cnt];
-      switch_clusters[switch_clusters_cnt].level_move  = &level_move[switch_clusters_cnt];
 
       buttons_cnt++;
       switch_clusters_cnt++;
     }
-    else if (entry[0] == 'R')
+    else if (entry[0] == 'R') // relay
     {
       GPIO_PinTypeDef pin = parsePin(entry + 1);
       init_gpio_output(pin);

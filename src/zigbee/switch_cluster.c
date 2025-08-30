@@ -68,7 +68,6 @@ void switch_cluster_add_to_endpoint(zigbee_switch_cluster *cluster, zigbee_endpo
   SETUP_ATTR(3, ZCL_ATTRID_ONOFF_CONFIGURATION_SWITCH_RELAY_MODE, ZCL_DATA_TYPE_ENUM8, ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE, cluster->relay_mode);
   SETUP_ATTR(4, ZCL_ATTRID_ONOFF_CONFIGURATION_SWITCH_RELAY_INDEX, ZCL_DATA_TYPE_UINT8, ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE, cluster->relay_index);
   SETUP_ATTR(5, ZCL_ATTRID_ONOFF_CONFIGURATION_SWITCH_LONG_PRESS_DUR, ZCL_DATA_TYPE_UINT16, ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE, cluster->button->long_press_duration_ms);
-  SETUP_ATTR(6, ZCL_ATTRID_ONOFF_CONFIGURATION_SWITCH_LEVEL_MOVE_RATE, ZCL_DATA_TYPE_UINT8, ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE, cluster->level_move->rate);
   SETUP_ATTR(7, ZCL_ATTRID_ONOFF_CONFIGURATION_SWITCH_BINDING_MODE, ZCL_DATA_TYPE_ENUM8, ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE, cluster->binded_mode);
 
   // Configuration
@@ -105,16 +104,6 @@ void switch_cluster_add_to_endpoint(zigbee_switch_cluster *cluster, zigbee_endpo
   info_multistate->attrTbl             = cluster->multistate_attr_infos;
   info_multistate->clusterRegisterFunc = zcl_multistate_input_register;
   info_multistate->clusterAppCb        = NULL;
-
-  // Output Level for other devices
-  zigbee_endpoint_add_cluster(endpoint, 0, ZCL_CLUSTER_GEN_LEVEL_CONTROL);
-  zcl_specClusterInfo_t *info_level = zigbee_endpoint_reserve_info(endpoint);
-  info_level->clusterId           = ZCL_CLUSTER_GEN_LEVEL_CONTROL;
-  info_level->manuCode            = MANUFACTURER_CODE_NONE;
-  info_level->attrNum             = 0;
-  info_level->attrTbl             = NULL;
-  info_level->clusterRegisterFunc = zcl_level_register;
-  info_level->clusterAppCb        = switch_cluster_callback_trampoline;
 }
 
 
@@ -253,40 +242,6 @@ void switch_cluster_binding_action_off(zigbee_switch_cluster *cluster) {
 }
 
 
-void switch_cluster_level_stop(zigbee_switch_cluster *cluster) {
-  if (!zb_isDeviceJoinedNwk()) {
-    return;
-  }
-
-  epInfo_t dstEpInfo;
-  TL_SETSTRUCTCONTENT(dstEpInfo, 0);
-
-  dstEpInfo.profileId   = HA_PROFILE_ID;
-  dstEpInfo.dstAddrMode = APS_DSTADDR_EP_NOTPRESETNT;
-
-  zcl_level_stopWithOnOffCmd(cluster->endpoint, &dstEpInfo, FALSE, NULL);
-}
-
-void switch_cluster_level_control(zigbee_switch_cluster *cluster) {
-  if (!zb_isDeviceJoinedNwk()) {
-    return;
-  }
-
-  epInfo_t dstEpInfo;
-  TL_SETSTRUCTCONTENT(dstEpInfo, 0);
-
-  dstEpInfo.profileId   = HA_PROFILE_ID;
-  dstEpInfo.dstAddrMode = APS_DSTADDR_EP_NOTPRESETNT;
-
-  if (cluster->level_move->moveMode == LEVEL_MOVE_DOWN) {
-    zcl_level_moveWithOnOffCmd(cluster->endpoint, &dstEpInfo, FALSE, cluster->level_move);
-    cluster->level_move->moveMode = LEVEL_MOVE_UP;
-  } else {
-    zcl_level_moveWithOnOffCmd(cluster->endpoint, &dstEpInfo, FALSE, cluster->level_move);
-    cluster->level_move->moveMode = LEVEL_MOVE_DOWN;
-  }
-}
-
 void switch_cluster_on_button_press(zigbee_switch_cluster *cluster)
 {
   zigbee_relay_cluster *relay_cluster = &relay_clusters[cluster->relay_index - 1];
@@ -332,9 +287,6 @@ void switch_cluster_on_button_release(zigbee_switch_cluster *cluster)
     if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_SHORT) {
       switch_cluster_binding_action_on(cluster);
     }
-  } else {
-    // This is end of long press, send zcl_level stop 
-    switch_cluster_level_stop(cluster);
   }
 
   cluster->multistate_state = MULTISTATE_NOT_PRESSED;
@@ -359,8 +311,6 @@ void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster)
   if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_LONG) {
     switch_cluster_binding_action_on(cluster);
   }
-
-  switch_cluster_level_control(cluster);
 
   cluster->multistate_state = MULTISTATE_LONG_PRESS;
   switch_cluster_report_action(cluster);
@@ -389,7 +339,6 @@ void switch_cluster_store_attrs_to_nv(zigbee_switch_cluster *cluster)
   nv_config_buffer.relay_index = cluster->relay_index;
   nv_config_buffer.relay_mode  = cluster->relay_mode;
   nv_config_buffer.button_long_press_duration = cluster->button->long_press_duration_ms;
-  nv_config_buffer.level_move_rate = cluster->level_move->rate;
   nv_config_buffer.binded_mode  = cluster->binded_mode;
 
   nv_flashWriteNew(1, NV_MODULE_APP, NV_ITEM_SWITCH_CLUSTER_DATA(cluster->switch_idx), sizeof(zigbee_switch_cluster_config), (u8 *)&nv_config_buffer);
@@ -408,7 +357,6 @@ void switch_cluster_load_attrs_from_nv(zigbee_switch_cluster *cluster)
   cluster->relay_index = nv_config_buffer.relay_index;
   cluster->relay_mode  = nv_config_buffer.relay_mode;
   cluster->button->long_press_duration_ms = nv_config_buffer.button_long_press_duration;
-  cluster->level_move->rate = nv_config_buffer.level_move_rate;
   cluster->binded_mode  = nv_config_buffer.binded_mode;
 }
 
