@@ -106,82 +106,6 @@ void switch_cluster_add_to_endpoint(zigbee_switch_cluster *cluster, zigbee_endpo
   info_multistate->clusterAppCb        = NULL;
 }
 
-/// --- SWITCH ACTIONS --- ///
-
-void switch_cluster_on_button_press(zigbee_switch_cluster *cluster)
-{
-  zigbee_relay_cluster *relay_cluster = &relay_clusters[cluster->relay_index - 1];
-
-  if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE) {
-    // Toggle does not support modes (RISE, SHORT, LONG)
-    if (cluster->relay_mode != ZCL_ONOFF_CONFIGURATION_RELAY_MODE_DETACHED) {
-      switch_cluster_relay_action_on(cluster);
-    }
-    switch_cluster_binding_action_on(cluster);
-    return;
-  }
-
-  if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_RISE) {
-    switch_cluster_relay_action_on(cluster);
-  }
-
-  if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_RISE) {
-    switch_cluster_binding_action_on(cluster);
-  }
-
-  cluster->multistate_state = MULTISTATE_PRESS;
-  switch_cluster_report_action(cluster);
-}
-
-void switch_cluster_on_button_release(zigbee_switch_cluster *cluster)
-{
-  zigbee_relay_cluster *relay_cluster = &relay_clusters[cluster->relay_index - 1];
-
-  if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE) {
-    // Toggle does not support modes (RISE, SHORT, LONG)
-    if (cluster->relay_mode != ZCL_ONOFF_CONFIGURATION_RELAY_MODE_DETACHED) {
-       switch_cluster_relay_action_off(cluster);
-    }
-    switch_cluster_binding_action_off(cluster);
-    return;
-  }
-
-  if (cluster->multistate_state != MULTISTATE_LONG_PRESS) {
-    if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_SHORT) {
-      switch_cluster_relay_action_on(cluster);
-    }
-    if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_SHORT) {
-      switch_cluster_binding_action_on(cluster);
-    }
-  }
-
-  cluster->multistate_state = MULTISTATE_NOT_PRESSED;
-  switch_cluster_report_action(cluster);
-}
-
-void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster)
-{
-  if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE)
-  {
-    // Toggle does not support modes (RISE, SHORT, LONG)
-    return;
-  }
-
-  zigbee_relay_cluster *relay_cluster = &relay_clusters[cluster->relay_index - 1];
-
-  if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_LONG)
-  {
-    relay_cluster_toggle(relay_cluster);
-  }
-
-  if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_LONG) {
-    switch_cluster_binding_action_on(cluster);
-  }
-
-  cluster->multistate_state = MULTISTATE_LONG_PRESS;
-  switch_cluster_report_action(cluster);
-}
-
 /// --- RELAY ACTIONS --- ///
 
 // Perform the relay action for ON position (position 1 in ZCL docs)
@@ -318,6 +242,81 @@ void switch_cluster_binding_action_off(zigbee_switch_cluster *cluster) {
   }
 }
 
+/// --- SWITCH ACTIONS --- ///
+
+void switch_cluster_on_button_press(zigbee_switch_cluster *cluster)
+{
+  // zigbee_relay_cluster *relay_cluster = &relay_clusters[cluster->relay_index - 1];
+
+  if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE) {
+    // Toggle does not support modes (RISE, SHORT, LONG)
+    if (cluster->relay_mode != ZCL_ONOFF_CONFIGURATION_RELAY_MODE_DETACHED) {
+      switch_cluster_relay_action_on(cluster);
+    }
+    switch_cluster_binding_action_on(cluster);
+    return;
+  }
+
+  if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_RISE) {
+    switch_cluster_relay_action_on(cluster);
+  }
+
+  if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_RISE) {
+    switch_cluster_binding_action_on(cluster);
+  }
+
+  cluster->multistate_state = MULTISTATE_PRESS;
+  switch_cluster_report_action(cluster);
+}
+
+void switch_cluster_on_button_release(zigbee_switch_cluster *cluster)
+{
+  // zigbee_relay_cluster *relay_cluster = &relay_clusters[cluster->relay_index - 1];
+
+  if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE) {
+    // Toggle does not support modes (RISE, SHORT, LONG)
+    if (cluster->relay_mode != ZCL_ONOFF_CONFIGURATION_RELAY_MODE_DETACHED) {
+       switch_cluster_relay_action_off(cluster);
+    }
+    switch_cluster_binding_action_off(cluster);
+    return;
+  }
+
+  if (cluster->multistate_state != MULTISTATE_LONG_PRESS) {
+    if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_SHORT) {
+      switch_cluster_relay_action_on(cluster);
+    }
+    if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_SHORT) {
+      switch_cluster_binding_action_on(cluster);
+    }
+  }
+
+  cluster->multistate_state = MULTISTATE_NOT_PRESSED;
+  switch_cluster_report_action(cluster);
+}
+
+void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster)
+{
+  if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE)
+  {
+    // Toggle does not support modes (RISE, SHORT, LONG)
+    return;
+  }
+
+  zigbee_relay_cluster *relay_cluster = &relay_clusters[cluster->relay_index - 1];
+
+  if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_LONG)
+  {
+    relay_cluster_toggle(relay_cluster);
+  }
+
+  if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_LONG) {
+    switch_cluster_binding_action_on(cluster);
+  }
+
+  cluster->multistate_state = MULTISTATE_LONG_PRESS;
+  switch_cluster_report_action(cluster);
+}
 
 /// --- FACTORY RESET --- ///
 

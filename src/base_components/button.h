@@ -6,6 +6,11 @@
 typedef void (*ev_button_callback_t)(void *);
 typedef void (*ev_button_multi_press_callback_t)(void *, u8);
 
+#define ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE                  0x00
+#define ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY               0x01
+#define ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MULTIFUNCTION           0x02 // unused
+#define ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE_INVERSE          0x10 // toggle inverse
+#define ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY_INVERSE       0x11 // momentary inverse
 
 #define DEBOUNCE_DELAY_MS 50
 
