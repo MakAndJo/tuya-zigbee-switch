@@ -122,47 +122,35 @@ void user_app_init(void)
 
 bool boot_announce_sent = false;
 
-void app_task(void)
-{
+void app_task(void) {
   millis_update();
   periferals_update();
-  if (bdb_isIdle())
-  {
-    if (zb_isDeviceJoinedNwk())
-    {
-      network_indicator_connected(&network_indicator);
-      if (zb_isDeviceFactoryNew())
-      {
-        zb_deviceFactoryNewSet(false);
-      }
+  if (!bdb_isIdle()) return;
 
-      if (!boot_announce_sent)
-      {
-        // Send announcement to notify that device is up
-        zb_zdoSendDevAnnance();
-        boot_announce_sent = true;
-      }
+  if (!zb_isDeviceJoinedNwk()) {
+    network_indicator_not_connected(&network_indicator);
+  } else {
+    network_indicator_connected(&network_indicator);
+    if (zb_isDeviceFactoryNew()) zb_deviceFactoryNewSet(false);
 
-      // report handler
-      if (g_baseAppCtx.lastReportCheckSec != seconds())
-      {
-        app_chk_report(seconds() - g_baseAppCtx.lastReportCheckSec);
-        g_baseAppCtx.lastReportCheckSec = seconds();
-      }
+    if (!boot_announce_sent) { // Send announcement to notify that device is up
+      zb_zdoSendDevAnnance();
+      boot_announce_sent = true;
+    }
 
-      update_relay_clusters();
+    if (g_baseAppCtx.lastReportCheckSec != seconds()) { // report handler
+      app_chk_report(seconds() - g_baseAppCtx.lastReportCheckSec);
+      g_baseAppCtx.lastReportCheckSec = seconds();
     }
-    else                 // Device not Joined
-    {
-      network_indicator_not_connected(&network_indicator);
-    }
-                #if PM_ENABLE
-    if (!tl_stackBusy() && zb_isTaskDone())
-    {
-      drv_pm_sleep(PM_SLEEP_MODE_SUSPEND, PM_WAKEUP_SRC_TIMER, PM_SLEEP_DURATION_MS);
-    }
-                #endif
+
+    update_relay_clusters();
   }
+
+  #if PM_ENABLE
+  if (!tl_stackBusy() && zb_isTaskDone()) {
+    drv_pm_sleep(PM_SLEEP_MODE_SUSPEND, PM_WAKEUP_SRC_TIMER, PM_SLEEP_DURATION_MS);
+  }
+  #endif
 }
 
 /*********************************************************************
@@ -174,24 +162,20 @@ void app_task(void)
  *
  * @return  None
  */
-void user_init(bool isRetention)
-{
-  if (!isRetention)
-  {
-    /* Populate properties with compiled-in values */
-
+void user_init(bool isRetention) {
+  if (isRetention) {
+    /* Re-config phy when system recovery from deep sleep with retention */
+    mac_phyReconfig();
+  } else {
     /* Initialize Stack */
     stack_init();
-
     /* Initialize user application */
     user_app_init();
-
     /* User's Task */
     ev_on_poll(EV_POLL_IDLE, app_task);
 
     /* Load the pre-install code from flash */
-    if (bdb_preInstallCodeLoad(&g_baseAppCtx.tcLinkKey.keyType, g_baseAppCtx.tcLinkKey.key) == RET_OK)
-    {
+    if (bdb_preInstallCodeLoad(&g_baseAppCtx.tcLinkKey.keyType, g_baseAppCtx.tcLinkKey.key) == RET_OK) {
       g_bdbCommissionSetting.linkKey.tcLinkKey.keyType = g_baseAppCtx.tcLinkKey.keyType;
       g_bdbCommissionSetting.linkKey.tcLinkKey.key     = g_baseAppCtx.tcLinkKey.key;
     }
@@ -201,10 +185,5 @@ void user_init(bool isRetention)
     /* Initialize BDB */
     u8 repower = drv_pm_deepSleep_flag_get() ? 0 : 1;
     bdb_init((af_simple_descriptor_t *)&endpoints[0].simple_description, &g_bdbCommissionSetting, &g_deviceBdbCb, repower);
-  }
-  else
-  {
-    /* Re-config phy when system recovery from deep sleep with retention */
-    mac_phyReconfig();
   }
 }
