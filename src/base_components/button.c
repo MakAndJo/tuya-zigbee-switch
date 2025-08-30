@@ -1,42 +1,46 @@
 #include "button.h"
 #include "tl_common.h"
 #include "millis.h"
+#include "custom_zcl/zcl_onoff_configuration.h"
 
 
 bool btn_debounce(button_t *button, u8 is_pressed);
 void btn_update_debounced(button_t *button, u8 is_pressed);
 
+bool btn_read(button_t *button) {
+  u8 state = drv_gpio_read(button->pin);
+  switch (button->mode) {
+    case ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE_INVERSE:
+    case ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY_INVERSE:
+      state = !state;
+      break;
+  }
+  return state;
+}
 
-void btn_init(button_t *button)
-{
+void btn_init(button_t *button) {
   // During device startup, button may be already pressed, but this should not be detected
   // as user press. So, to avoid such situation, special init is required.
-  u8 state = !drv_gpio_read(button->pin);
+  u8 state = btn_read(button);
   if (!state) {
-     button->pressed = true;
-     button->long_pressed = true;
+    button->pressed = true;
+    button->long_pressed = true;
   }
 }
 
-void btn_update(button_t *button)
-{
-  u8 state = !drv_gpio_read(button->pin);
-
-  if (btn_debounce(button, state))
-  {
+void btn_update(button_t *button) {
+  u8 state = btn_read(button);
+  if (btn_debounce(button, state)) {
     btn_update_debounced(button, !state);
   }
 }
 
 bool btn_debounce(button_t *button, u8 is_pressed) {
   u32 now = millis();
-
-  if (is_pressed != button->debounce_last_state)
-  {
+  if (is_pressed != button->debounce_last_state) {
     button->debounce_last_state = is_pressed;
     button->debounce_last_change = now;
   }
-
   return (now - button->debounce_last_change) > DEBOUNCE_DELAY_MS;
 }
 

@@ -154,11 +154,12 @@ void parse_config()
       init_gpio_input(pin, pull);
 
       buttons[buttons_cnt].pin = pin;
-      buttons[buttons_cnt].long_press_duration_ms  = 800;
+      buttons[buttons_cnt].mode = ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE;
+      buttons[buttons_cnt].long_press_duration_ms = 800;
       buttons[buttons_cnt].multi_press_duration_ms = 800;
 
       switch_clusters[switch_clusters_cnt].switch_idx  = switch_clusters_cnt;
-      switch_clusters[switch_clusters_cnt].mode        = ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_TOGGLE;
+      // switch_clusters[switch_clusters_cnt].mode        = ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_TOGGLE;
       switch_clusters[switch_clusters_cnt].action      = ZCL_ONOFF_CONFIGURATION_SWITCH_ACTION_TOGGLE_SIMPLE;
       switch_clusters[switch_clusters_cnt].relay_mode  = ZCL_ONOFF_CONFIGURATION_RELAY_MODE_SHORT;
       switch_clusters[switch_clusters_cnt].binded_mode = ZCL_ONOFF_CONFIGURATION_BINDED_MODE_SHORT;
@@ -194,16 +195,9 @@ void parse_config()
       u32 image_type = parseInt(entry + 1);
       baseEndpoint_otaInfo.imageType = image_type;
     }
-    else if (entry[0] == 'M')
-    {
-      for (int index = 0; index < switch_clusters_cnt; index++)
-      {
-        switch_clusters[index].mode = ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_MOMENTARY;
-      }
-    }
   }
 
-  periferals_init();
+  millis_init();
 
   u8 total_endpoints = switch_clusters_cnt + relay_clusters_cnt;
 
@@ -235,6 +229,9 @@ void parse_config()
   {
     zigbee_endpoint_register_self(&endpoints[index]);
   }
+
+  periferals_init();
+
   cursor--;
   while (cursor != device_config_str.data)
   {
@@ -249,7 +246,6 @@ void parse_config()
 
 void periferals_init()
 {
-  millis_init();
   for (int index = 0; index < buttons_cnt; index++)
   {
     btn_init(&buttons[index]);

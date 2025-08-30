@@ -11,19 +11,20 @@
 
 typedef struct
 {
-  u8  mode;
+  // u8  mode;
   u8  action;
   u8  relay_mode;
   u8  relay_index;
   u16 button_long_press_duration;
-  u8  binded_mode;
+  u8 button_mode;
+  u8 binded_mode;
 } zigbee_switch_cluster_config;
 
 typedef struct
 {
   u8            switch_idx;
   u8            endpoint;
-  u8            mode;
+  // u8            mode;
   u8            action;
   u8            relay_mode;
   u8            relay_index;

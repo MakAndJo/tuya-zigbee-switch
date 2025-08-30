@@ -11,6 +11,7 @@ typedef void (*ev_button_multi_press_callback_t)(void *, u8);
 
 typedef struct
 {
+  u8                               mode;
   u32                              pin;
   u8                               pressed;
   u8                               long_pressed;
