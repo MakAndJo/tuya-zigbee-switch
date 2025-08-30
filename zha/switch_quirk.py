@@ -175,7 +175,14 @@ for config in CONFIGS:
                 endpoint_id=endpoint_id,
                 reporting_config=ReportingConfig(min_interval=0, max_interval=300, reportable_change=1),
                 device_class=SensorDeviceClass.ENUM,
-                # attribute_converter = lambda x: {0: "released", 1: "press", 2: "long_press"}[int(x)]
+                attribute_converter = lambda x: {
+                    0: "release",
+                    1: "single",
+                    255: "hold",
+                    2: "double",
+                    3: "triple",
+                    4: "quadruple",
+                }[int(x)]
             )
         )
 
