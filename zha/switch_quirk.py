@@ -7,12 +7,6 @@ from zigpy.zcl.clusters.general import OnOffConfiguration, MultistateInput, OnOf
 from zigpy.zcl.foundation import ZCLAttributeDef, ZCLAttributeAccess
 import zigpy.types as t
 
-class SwitchMode(t.enum8):
-    Toggle = 0x00
-    Momentary = 0x01
-    Multifunction = 0x02
-    ToggleInverse = 0x10
-    MomentaryInverse = 0x11
 
 class SwitchActions(t.enum8):
     OnOff = 0x00
@@ -21,17 +15,35 @@ class SwitchActions(t.enum8):
     ToggleSmartSync = 0x03
     ToggleSmartOpposite = 0x04
 
+class SwitchMode(t.enum8):
+    Toggle = 0x00
+    Momentary = 0x01
+    Multifunction = 0x02
+    ToggleInverse = 0x10
+    MomentaryInverse = 0x11
+
 class RelayMode(t.enum8):
     Detached = 0x00
-    Raise = 0x01
-    LongPress = 0x02
-    ShortPress = 0x03
-
+    Press = 0x01
+    ShortPress = 0x02
+    LongPress = 0x03
 
 class BindedMode(t.enum8):
-    Raise = 0x01
+    Press = 0x01
     LongPress = 0x02
     ShortPress = 0x03
+
+class BothPressAction(t.enum8):
+    NoAction = 0x00
+    OnOff = 0x01
+    OffOn = 0x02
+    ToggleToggle = 0x03
+
+class BothHoldAction(t.enum8):
+    NoAction = 0x00
+    OnOff = 0x01
+    OffOn = 0x02
+    ToggleToggle = 0x03
 
 
 class CustomOnOffConfigurationCluster(CustomCluster, OnOffConfiguration):
@@ -80,6 +92,20 @@ class CustomOnOffConfigurationCluster(CustomCluster, OnOffConfiguration):
         multi_press_duration = ZCLAttributeDef(
             id=t.uint16_t(0xff05),
             type=t.uint16_t,
+            access=(ZCLAttributeAccess.Read | ZCLAttributeAccess.Write),
+            is_manufacturer_specific=True,
+        )
+
+        both_press_action = ZCLAttributeDef(
+            id=t.uint16_t(0xff07),
+            type=BothHoldAction,
+            access=(ZCLAttributeAccess.Read | ZCLAttributeAccess.Write),
+            is_manufacturer_specific=True,
+        )
+
+        both_hold_action = ZCLAttributeDef(
+            id=t.uint16_t(0xff08),
+            type=BothHoldAction,
             access=(ZCLAttributeAccess.Read | ZCLAttributeAccess.Write),
             is_manufacturer_specific=True,
         )
@@ -190,6 +216,22 @@ for config in CONFIGS:
                 min_value=50,
                 max_value=5000,
                 step=1,
+            )
+            .enum(
+                CustomOnOffConfigurationCluster.AttributeDefs.both_press_action.name,
+                BothPressAction,
+                CustomOnOffConfigurationCluster.cluster_id,
+                translation_key="both_press_action",
+                fallback_name=f"Both press action {endpoint_id}",
+                endpoint_id=endpoint_id,
+            )
+            .enum(
+                CustomOnOffConfigurationCluster.AttributeDefs.both_hold_action.name,
+                BothHoldAction,
+                CustomOnOffConfigurationCluster.cluster_id,
+                translation_key="both_hold_action",
+                fallback_name=f"Both hold action {endpoint_id}",
+                endpoint_id=endpoint_id,
             )
             .sensor(
                 MultistateInput.AttributeDefs.present_value.name,

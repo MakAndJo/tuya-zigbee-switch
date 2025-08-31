@@ -19,6 +19,8 @@
 #define ZCL_ATTRID_ONOFF_CONFIGURATION_SWITCH_BINDING_MODE          0xff03
 #define ZCL_ATTRID_ONOFF_CONFIGURATION_SWITCH_LONG_PRESS_DUR        0xff04
 #define ZCL_ATTRID_ONOFF_CONFIGURATION_SWITCH_MULTI_PRESS_DUR       0xff05
+#define ZCL_ATTRID_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION     0xff07
+#define ZCL_ATTRID_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION      0xff08
 
 #define ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_TOGGLE                  0x00 // unused
 #define ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_MOMENTARY               0x01 // unused
@@ -32,13 +34,22 @@
 
 #define ZCL_ONOFF_CONFIGURATION_RELAY_MODE_DETACHED                 0x00 // switch is detached from relay
 #define ZCL_ONOFF_CONFIGURATION_RELAY_MODE_RISE                     0x01 // not waiting (press -> on)
-#define ZCL_ONOFF_CONFIGURATION_RELAY_MODE_LONG                     0x02 // waiting for long press (press -> release -> on)
-#define ZCL_ONOFF_CONFIGURATION_RELAY_MODE_SHORT                    0x03 // waiting for short press (press -> release -> on)
+#define ZCL_ONOFF_CONFIGURATION_RELAY_MODE_SHORT                    0x02 // waiting for short press (press -> release -> on)
+#define ZCL_ONOFF_CONFIGURATION_RELAY_MODE_LONG                     0x03 // waiting for long press (press -> release -> on)
 
-#define ZCL_ONOFF_CONFIGURATION_BINDED_MODE_RISE                     0x01
-#define ZCL_ONOFF_CONFIGURATION_BINDED_MODE_LONG                     0x02
-#define ZCL_ONOFF_CONFIGURATION_BINDED_MODE_SHORT                    0x03
+#define ZCL_ONOFF_CONFIGURATION_BINDED_MODE_RISE                    0x01
+#define ZCL_ONOFF_CONFIGURATION_BINDED_MODE_LONG                    0x02
+#define ZCL_ONOFF_CONFIGURATION_BINDED_MODE_SHORT                   0x03
 
+#define ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION_NONE				0x00
+#define ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION_ONOFF			0x01
+#define ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION_OFFON			0x02
+#define ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION_TOGGLE			0x03
+
+#define ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION_NONE				0x00
+#define ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION_ONOFF				0x01
+#define ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION_OFFON				0x02
+#define ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION_TOGGLE			0x03
 
 
 status_t zcl_onoff_configuration_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);

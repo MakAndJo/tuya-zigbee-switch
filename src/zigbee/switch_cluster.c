@@ -61,13 +61,15 @@ void switch_cluster_add_to_endpoint(zigbee_switch_cluster *cluster, zigbee_endpo
   SETUP_ATTR(5, ZCL_ATTRID_ONOFF_CONFIGURATION_SWITCH_BINDING_MODE, ZCL_DATA_TYPE_ENUM8, ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE, cluster->binded_mode);
   SETUP_ATTR(6, ZCL_ATTRID_ONOFF_CONFIGURATION_SWITCH_LONG_PRESS_DUR, ZCL_DATA_TYPE_UINT16, ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE, cluster->button->long_press_duration_ms);
   SETUP_ATTR(7, ZCL_ATTRID_ONOFF_CONFIGURATION_SWITCH_MULTI_PRESS_DUR, ZCL_DATA_TYPE_UINT16, ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE, cluster->button->multi_press_duration_ms);
+  SETUP_ATTR(8, ZCL_ATTRID_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION, ZCL_DATA_TYPE_ENUM8, ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE, cluster->both_press_action);
+  SETUP_ATTR(9, ZCL_ATTRID_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION, ZCL_DATA_TYPE_ENUM8, ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE, cluster->both_hold_action);
 
   // Configuration
   zigbee_endpoint_add_cluster(endpoint, 1, ZCL_CLUSTER_GEN_ON_OFF_SWITCH_CONFIG);
   zcl_specClusterInfo_t *info_conf = zigbee_endpoint_reserve_info(endpoint);
   info_conf->clusterId           = ZCL_CLUSTER_GEN_ON_OFF_SWITCH_CONFIG;
   info_conf->manuCode            = MANUFACTURER_CODE_NONE;
-  info_conf->attrNum             = 8;
+  info_conf->attrNum             = 10;
   info_conf->attrTbl             = cluster->attr_infos;
   info_conf->clusterRegisterFunc = zcl_onoff_configuration_register;
   info_conf->clusterAppCb        = switch_cluster_callback_trampoline;
@@ -297,11 +299,11 @@ void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster) {
   if (cluster->multistate_state != MULTISTATE_BOTH_PRESS &&
       cluster->multistate_state != MULTISTATE_BOTH_HOLD)
   {
-  if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_LONG) {
-    switch_cluster_relay_action_on(cluster);
-  }
-  if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_LONG) {
-    switch_cluster_binding_action_on(cluster);
+    if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_LONG) {
+      switch_cluster_relay_action_on(cluster);
+    }
+    if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_LONG) {
+      switch_cluster_binding_action_on(cluster);
     }
   }
 
@@ -311,7 +313,7 @@ void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster) {
 
 void switch_cluster_on_button_multi_press(zigbee_switch_cluster *cluster, u8 press_count) {
   switch (press_count) {
-    case 1:
+    case 1: // unused
       cluster->multistate_state = MULTISTATE_PRESS;
       break;
     case 2:
@@ -339,6 +341,41 @@ void switch_cluster_on_button_multi_press(zigbee_switch_cluster *cluster, u8 pre
       cluster->multistate_state = MULTISTATE_PRESS;
       break;
   }
+
+  zigbee_relay_cluster *relay_cluster = &relay_clusters[cluster->relay_index - 1];
+
+  if (cluster->multistate_state == MULTISTATE_BOTH_PRESS) {
+    switch (cluster->both_press_action) {
+      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION_ONOFF:
+        relay_cluster_on(relay_cluster);
+        break;
+      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION_OFFON:
+        relay_cluster_off(relay_cluster);
+        break;
+      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION_TOGGLE:
+        relay_cluster_toggle(relay_cluster);
+        break;
+      default:
+        break;
+    }
+  }
+
+  if (cluster->multistate_state == MULTISTATE_BOTH_HOLD) {
+    switch (cluster->both_hold_action) {
+      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION_ONOFF:
+        relay_cluster_on(relay_cluster);
+        break;
+      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION_OFFON:
+        relay_cluster_off(relay_cluster);
+        break;
+      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION_TOGGLE:
+        relay_cluster_toggle(relay_cluster);
+        break;
+      default:
+        break;
+    }
+  }
+
   switch_cluster_report_action(cluster);
 }
 
@@ -353,12 +390,14 @@ zigbee_switch_cluster_config nv_config_buffer;
 
 void switch_cluster_store_attrs_to_nv(zigbee_switch_cluster *cluster)
 {
-  nv_config_buffer.action      = cluster->action;
-  nv_config_buffer.relay_index = cluster->relay_index;
-  nv_config_buffer.relay_mode  = cluster->relay_mode;
+  nv_config_buffer.action                 = cluster->action;
+  nv_config_buffer.both_press_action      = cluster->both_press_action;
+  nv_config_buffer.both_hold_action       = cluster->both_hold_action;
+  nv_config_buffer.relay_index            = cluster->relay_index;
+  nv_config_buffer.relay_mode             = cluster->relay_mode;
   nv_config_buffer.button_long_press_duration = cluster->button->long_press_duration_ms;
-  nv_config_buffer.button_mode = cluster->button->mode;
-  nv_config_buffer.binded_mode  = cluster->binded_mode;
+  nv_config_buffer.button_mode            = cluster->button->mode;
+  nv_config_buffer.binded_mode            = cluster->binded_mode;
 
   nv_flashWriteNew(1, NV_MODULE_APP, NV_ITEM_SWITCH_CLUSTER_DATA(cluster->switch_idx), sizeof(zigbee_switch_cluster_config), (u8 *)&nv_config_buffer);
 }
@@ -371,12 +410,14 @@ void switch_cluster_load_attrs_from_nv(zigbee_switch_cluster *cluster)
   {
     return;
   }
-  cluster->action      = nv_config_buffer.action;
-  cluster->relay_index = nv_config_buffer.relay_index;
-  cluster->relay_mode  = nv_config_buffer.relay_mode;
+  cluster->action                 = nv_config_buffer.action;
+  cluster->both_press_action      = nv_config_buffer.both_press_action;
+  cluster->both_hold_action       = nv_config_buffer.both_hold_action;
+  cluster->relay_index            = nv_config_buffer.relay_index;
+  cluster->relay_mode             = nv_config_buffer.relay_mode;
   cluster->button->long_press_duration_ms = nv_config_buffer.button_long_press_duration;
-  cluster->button->mode = nv_config_buffer.button_mode;
-  cluster->binded_mode = nv_config_buffer.binded_mode;
+  cluster->button->mode           = nv_config_buffer.button_mode;
+  cluster->binded_mode            = nv_config_buffer.binded_mode;
 }
 
 void switch_cluster_report_action(zigbee_switch_cluster *cluster) {
