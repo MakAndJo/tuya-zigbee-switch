@@ -4,10 +4,10 @@ from zhaquirks import CustomCluster
 from zigpy.quirks.v2 import QuirkBuilder, ReportingConfig, SensorDeviceClass
 from zigpy.zcl import ClusterType, foundation
 from zigpy.zcl.clusters.general import OnOffConfiguration, MultistateInput, OnOff
-from zigpy.zcl.foundation import ZCLAttributeDef
+from zigpy.zcl.foundation import ZCLAttributeDef, ZCLAttributeAccess
 import zigpy.types as t
 
-class SwitchType(t.enum8):
+class SwitchMode(t.enum8):
     Toggle = 0x00
     Momentary = 0x01
     Multifunction = 0x02
@@ -37,49 +37,63 @@ class BindedMode(t.enum8):
 class CustomOnOffConfigurationCluster(CustomCluster, OnOffConfiguration):
 
     class AttributeDefs(OnOffConfiguration.AttributeDefs):
-        """Attribute Definitions."""
+        """Attribute Definitions"""
+        # switch_actions and switch_type is defined in zigpy
+        # we override it later
+        # here we just set our custom defs
 
         switch_mode = ZCLAttributeDef(
-            id=0xff00,
-            type=SwitchType,
-            access="rw",
-            is_manufacturer_specific=True,
+            id = t.uint16_t(0xff00),
+            type = SwitchMode,
+            access = (ZCLAttributeAccess.Read | ZCLAttributeAccess.Write),
+            is_manufacturer_specific = True,
         )
 
         relay_mode = ZCLAttributeDef(
-            id=0xff01,
+            id=t.uint16_t(0xff01),
             type=RelayMode,
-            access="rw",
+            access=(ZCLAttributeAccess.Read | ZCLAttributeAccess.Write),
             is_manufacturer_specific=True,
         )
 
         relay_index = ZCLAttributeDef(
-            id=0xff02,
+            id=t.uint16_t(0xff02),
             type=t.uint8_t,
-            access="rw",
-            is_manufacturer_specific=True,
-        )
-
-        long_press_duration = ZCLAttributeDef(
-            id=0xff03,
-            type=t.uint16_t,
-            access="rw",
+            access=(ZCLAttributeAccess.Read | ZCLAttributeAccess.Write),
             is_manufacturer_specific=True,
         )
 
         binded_mode = ZCLAttributeDef(
-            id=0xff05,
+            id=t.uint16_t(0xff03),
             type=BindedMode,
-            access="rw",
+            access=(ZCLAttributeAccess.Read | ZCLAttributeAccess.Write),
             is_manufacturer_specific=True,
         )
+
+        long_press_duration = ZCLAttributeDef(
+            id=t.uint16_t(0xff04),
+            type=t.uint16_t,
+            access=(ZCLAttributeAccess.Read | ZCLAttributeAccess.Write),
+            is_manufacturer_specific=True,
+        )
+
+        multi_press_duration = ZCLAttributeDef(
+            id=t.uint16_t(0xff05),
+            type=t.uint16_t,
+            access=(ZCLAttributeAccess.Read | ZCLAttributeAccess.Write),
+            is_manufacturer_specific=True,
+        )
+
 
 
 class CustomMultistateInputCluster(CustomCluster, MultistateInput):
 
     class AttributeDefs(foundation.BaseAttributeDefs):
         present_value: Final = ZCLAttributeDef(
-            id=0x0055, type=t.uint16_t, access="r*w", mandatory=True
+            id=t.uint16_t(0x0055),
+            type=t.uint16_t,
+            access=(ZCLAttributeAccess.Read | ZCLAttributeAccess.Write | ZCLAttributeAccess.Report),
+            mandatory=True,
         )
         cluster_revision: Final = foundation.ZCL_CLUSTER_REVISION_ATTR
         reporting_status: Final = foundation.ZCL_REPORTING_STATUS_ATTR
@@ -125,7 +139,7 @@ for config in CONFIGS:
             )
             .enum(
                 CustomOnOffConfigurationCluster.AttributeDefs.switch_mode.name,
-                SwitchType,
+                SwitchMode,
                 CustomOnOffConfigurationCluster.cluster_id,
                 translation_key="switch_mode",
                 fallback_name=f"Switch mode {endpoint_id}",
@@ -163,7 +177,17 @@ for config in CONFIGS:
                 translation_key="long_press_duration",
                 fallback_name=f"Long press duration {endpoint_id}",
                 endpoint_id=endpoint_id,
-                min_value=0,
+                min_value=50,
+                max_value=5000,
+                step=1,
+            )
+            .number(
+                CustomOnOffConfigurationCluster.AttributeDefs.multi_press_duration.name,
+                CustomOnOffConfigurationCluster.cluster_id,
+                translation_key="multi_press_duration",
+                fallback_name=f"Multi press duration {endpoint_id}",
+                endpoint_id=endpoint_id,
+                min_value=50,
                 max_value=5000,
                 step=1,
             )
