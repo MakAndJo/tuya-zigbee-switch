@@ -251,16 +251,46 @@ void periferals_init()
   }
 }
 
-
-void periferals_update()
-{
-  for (int index = 0; index < leds_cnt; index++)
-  {
+static u8 both_sent = 0;
+static u8 both_hold_sent = 0;
+void periferals_update() {
+  for (int index = 0; index < leds_cnt; index++) {
     led_update(&leds[index]);
   }
-  for (int index = 0; index < buttons_cnt; index++)
-  {
+  for (int index = 0; index < buttons_cnt; index++) {
     btn_update(&buttons[index]);
+  }
+
+  if (switch_clusters_cnt >= 2) {
+    button_t *btnA = switch_clusters[0].button;
+    button_t *btnB = switch_clusters[1].button;
+    if (btnA && btnB) {
+      if (btnA->pressed && btnB->pressed) {
+        if (!both_sent) {
+          both_sent = 1;
+          printf("BOTH pressed!\r\n");
+          if (btnA->on_multi_press) {
+            btnA->on_multi_press(btnA->callback_param, MULTI_PRESS_BOTH); // 253 BOTH
+          }
+          if (btnB->on_multi_press) {
+            btnB->on_multi_press(btnB->callback_param, MULTI_PRESS_BOTH); // 253 BOTH
+          }
+        }
+        if (!both_hold_sent && btnA->long_pressed && btnB->long_pressed) {
+          both_hold_sent = 1;
+          printf("BOTH hold!\r\n");
+          if (btnA->on_multi_press) {
+            btnA->on_multi_press(btnA->callback_param, MULTI_PRESS_BOTH_HOLD); // 254 BOTH_HOLD
+          }
+          if (btnB->on_multi_press) {
+            btnB->on_multi_press(btnB->callback_param, MULTI_PRESS_BOTH_HOLD); // 254 BOTH_HOLD
+          }
+        }
+      } else {
+        both_sent = 0;
+        both_hold_sent = 0;
+      }
+    }
   }
 }
 

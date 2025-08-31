@@ -202,10 +202,13 @@ for config in CONFIGS:
                 attribute_converter = lambda x: {
                     0: "release",
                     1: "single",
-                    255: "hold",
+                    128: "hold",
                     2: "double",
                     3: "triple",
                     4: "quadruple",
+                    5: "quintuple",
+                    201: "both",
+                    202: "both_hold",
                 }[int(x)]
             )
         )

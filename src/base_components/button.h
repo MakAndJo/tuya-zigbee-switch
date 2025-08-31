@@ -4,7 +4,7 @@
 #include "types.h"
 
 typedef void (*ev_button_callback_t)(void *);
-typedef void (*ev_button_multi_press_callback_t)(void *, u8);
+typedef void (*ev_button_multi_press_callback_t)(void *param, u8 *press_cnt);
 
 #define ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE                  0x00
 #define ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY               0x01

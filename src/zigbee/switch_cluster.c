@@ -11,23 +11,11 @@
 #include "base_components/relay.h"
 #include "configs/nv_slots_cfg.h"
 
-#define MULTI_PRESS_CNT_TO_RESET    10
-
 const u8  multistate_out_of_service = 0;
 const u8  multistate_flags          = 0;
-const u16 multistate_num_of_states  = 3;
-
-
-#define MULTISTATE_NOT_PRESSED      0
-#define MULTISTATE_PRESS            1
-#define MULTISTATE_LONG_PRESS       255
-#define MULTISTATE_PRESS_DOUBLE     2
-#define MULTISTATE_PRESS_TRIPLE     3
-#define MULTISTATE_PRESS_QUADRUPLE  4
-
+const u16 multistate_num_of_states  = 8;
 
 extern zigbee_relay_cluster relay_clusters[];
-
 
 void switch_cluster_on_button_press(zigbee_switch_cluster *cluster);
 void switch_cluster_on_button_release(zigbee_switch_cluster *cluster);
@@ -259,12 +247,11 @@ void switch_cluster_on_button_press(zigbee_switch_cluster *cluster) {
   if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_RISE) {
     switch_cluster_relay_action_on(cluster);
   }
-
   if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_RISE) {
     switch_cluster_binding_action_on(cluster);
   }
 
-  if (cluster->button->multi_press_cnt <= 1) {
+  if (cluster->button->multi_press_cnt <= 1) { // only first press
     cluster->multistate_state = MULTISTATE_PRESS;
     switch_cluster_report_action(cluster);
   }
@@ -284,7 +271,9 @@ void switch_cluster_on_button_release(zigbee_switch_cluster *cluster)
     return;
   }
 
-  if (cluster->multistate_state != MULTISTATE_LONG_PRESS) {
+  if (cluster->multistate_state == MULTISTATE_PRESS ||
+      cluster->multistate_state == MULTISTATE_NOT_PRESSED)
+  {
     if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_SHORT) {
       switch_cluster_relay_action_on(cluster);
     }
@@ -305,32 +294,46 @@ void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster) {
     return;
   }
 
+  if (cluster->multistate_state != MULTISTATE_BOTH_PRESS &&
+      cluster->multistate_state != MULTISTATE_BOTH_HOLD)
+  {
   if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_LONG) {
     switch_cluster_relay_action_on(cluster);
   }
-
   if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_LONG) {
     switch_cluster_binding_action_on(cluster);
+    }
   }
 
-  cluster->multistate_state = MULTISTATE_LONG_PRESS;
+  cluster->multistate_state = MULTISTATE_HOLD;
   switch_cluster_report_action(cluster);
 }
 
 void switch_cluster_on_button_multi_press(zigbee_switch_cluster *cluster, u8 press_count) {
-  if (press_count > MULTI_PRESS_CNT_TO_RESET) factoryReset();
   switch (press_count) {
     case 1:
       cluster->multistate_state = MULTISTATE_PRESS;
       break;
     case 2:
-      cluster->multistate_state = MULTISTATE_PRESS_DOUBLE;
+      cluster->multistate_state = MULTISTATE_DOUBLE_PRESS;
       break;
     case 3:
-      cluster->multistate_state = MULTISTATE_PRESS_TRIPLE;
+      cluster->multistate_state = MULTISTATE_TRIPLE_PRESS;
       break;
     case 4:
-      cluster->multistate_state = MULTISTATE_PRESS_QUADRUPLE;
+      cluster->multistate_state = MULTISTATE_QUADRUPLE_PRESS;
+      break;
+    case 5:
+      cluster->multistate_state = MULTISTATE_QUINTUPLE_PRESS;
+      break;
+    case MULTI_PRESS_CNT_TO_RESET:
+      return factoryReset();
+      break;
+    case MULTI_PRESS_BOTH: // 253 BOTH
+      cluster->multistate_state = MULTISTATE_BOTH_PRESS;
+      break;
+    case MULTI_PRESS_BOTH_HOLD: // 253 BOTH
+      cluster->multistate_state = MULTISTATE_BOTH_HOLD;
       break;
     default:
       cluster->multistate_state = MULTISTATE_PRESS;

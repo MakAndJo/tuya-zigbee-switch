@@ -9,6 +9,20 @@
 #include "base_components/button.h"
 #include "custom_zcl/zcl_onoff_configuration.h"
 
+#define MULTI_PRESS_CNT_TO_RESET    10
+#define MULTI_PRESS_BOTH            253
+#define MULTI_PRESS_BOTH_HOLD       254
+
+#define MULTISTATE_NOT_PRESSED      0
+#define MULTISTATE_PRESS            1
+#define MULTISTATE_HOLD             128
+#define MULTISTATE_DOUBLE_PRESS     2
+#define MULTISTATE_TRIPLE_PRESS     3
+#define MULTISTATE_QUADRUPLE_PRESS  4
+#define MULTISTATE_QUINTUPLE_PRESS  5
+#define MULTISTATE_BOTH_PRESS       201
+#define MULTISTATE_BOTH_HOLD        202
+
 typedef struct
 {
   u8  action;
