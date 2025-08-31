@@ -131,7 +131,7 @@ for config in CONFIGS:
                 SwitchActions,
                 CustomOnOffConfigurationCluster.cluster_id,
                 translation_key="switch_actions",
-                fallback_name="Switch actions",
+                fallback_name=f"Switch actions {endpoint_id}",
                 endpoint_id=endpoint_id,
                 # Next is hack to force binding to make all attrs values visible.
                 # TODO: find a better approach
