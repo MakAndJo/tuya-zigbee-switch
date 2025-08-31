@@ -121,14 +121,14 @@ for config in CONFIGS:
                 endpoint_id=endpoint_id,
                 # Next is hack to force binding to make all attrs values visible.
                 # TODO: find a better approach
-                reporting_config=ReportingConfig(min_interval=0, max_interval=300, reportable_change=1),
+                # reporting_config=ReportingConfig(min_interval=0, max_interval=300, reportable_change=1),
             )
             .enum(
                 CustomOnOffConfigurationCluster.AttributeDefs.switch_mode.name,
                 SwitchType,
                 CustomOnOffConfigurationCluster.cluster_id,
                 translation_key="switch_mode",
-                fallback_name="Switch mode",
+                fallback_name=f"Switch mode {endpoint_id}",
                 endpoint_id=endpoint_id,
             )
             .enum(
@@ -136,42 +136,42 @@ for config in CONFIGS:
                 RelayMode,
                 CustomOnOffConfigurationCluster.cluster_id,
                 translation_key="relay_mode",
-                fallback_name="Relay mode",
+                fallback_name=f"Relay mode {endpoint_id}",
                 endpoint_id=endpoint_id,
             )
             .number(
                 CustomOnOffConfigurationCluster.AttributeDefs.relay_index.name,
                 CustomOnOffConfigurationCluster.cluster_id,
                 translation_key="relay_index",
-                fallback_name="Relay index",
+                fallback_name=f"Relay index {endpoint_id}",
+                endpoint_id=endpoint_id,
                 min_value=1,
                 max_value=relay_cnt,
                 step=1,
-                endpoint_id=endpoint_id,
             )
             .enum(
                 CustomOnOffConfigurationCluster.AttributeDefs.binded_mode.name,
                 BindedMode,
                 CustomOnOffConfigurationCluster.cluster_id,
                 translation_key="binded_mode",
-                fallback_name="Binded mode",
+                fallback_name=f"Binded mode {endpoint_id}",
                 endpoint_id=endpoint_id,
             )
             .number(
                 CustomOnOffConfigurationCluster.AttributeDefs.long_press_duration.name,
                 CustomOnOffConfigurationCluster.cluster_id,
                 translation_key="long_press_duration",
-                fallback_name="Long press mode",
+                fallback_name=f"Long press duration {endpoint_id}",
+                endpoint_id=endpoint_id,
                 min_value=0,
                 max_value=5000,
                 step=1,
-                endpoint_id=endpoint_id,
             )
             .sensor(
                 MultistateInput.AttributeDefs.present_value.name,
                 MultistateInput.cluster_id,
                 translation_key="press_action",
-                fallback_name="Press action",
+                fallback_name=f"Press action {endpoint_id}",
                 endpoint_id=endpoint_id,
                 reporting_config=ReportingConfig(min_interval=0, max_interval=300, reportable_change=1),
                 device_class=SensorDeviceClass.ENUM,
