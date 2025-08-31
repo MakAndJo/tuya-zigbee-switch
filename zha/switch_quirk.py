@@ -135,7 +135,7 @@ for config in CONFIGS:
                 endpoint_id=endpoint_id,
                 # Next is hack to force binding to make all attrs values visible.
                 # TODO: find a better approach
-                # reporting_config=ReportingConfig(min_interval=0, max_interval=300, reportable_change=1),
+                reporting_config=ReportingConfig(min_interval=0, max_interval=300, reportable_change=1),
             )
             .enum(
                 CustomOnOffConfigurationCluster.AttributeDefs.switch_mode.name,
