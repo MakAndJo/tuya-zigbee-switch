@@ -159,7 +159,7 @@ void parse_config()
       buttons[buttons_cnt].multi_press_duration_ms = 800;
 
       switch_clusters[switch_clusters_cnt].switch_idx  = switch_clusters_cnt;
-      switch_clusters[switch_clusters_cnt].both_press_action = ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION_NONE;
+      switch_clusters[switch_clusters_cnt].both_press_action = ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION_TOGGLE;
       switch_clusters[switch_clusters_cnt].both_hold_action = ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION_NONE;
       switch_clusters[switch_clusters_cnt].action = ZCL_ONOFF_CONFIGURATION_SWITCH_ACTION_TOGGLE_SIMPLE;
       switch_clusters[switch_clusters_cnt].relay_mode  = ZCL_ONOFF_CONFIGURATION_RELAY_MODE_SHORT;

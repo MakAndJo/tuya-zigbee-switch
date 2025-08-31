@@ -47,10 +47,10 @@ void switch_cluster_add_to_endpoint(zigbee_switch_cluster *cluster, zigbee_endpo
   cluster->endpoint = endpoint->index;
   switch_cluster_load_attrs_from_nv(cluster);
 
-  cluster->button->on_press       = (ev_button_callback_t)switch_cluster_on_button_press;
-  cluster->button->on_release     = (ev_button_callback_t)switch_cluster_on_button_release;
-  cluster->button->on_long_press  = (ev_button_callback_t)switch_cluster_on_button_long_press;
-  cluster->button->on_multi_press = (ev_button_multi_press_callback_t)switch_cluster_on_button_multi_press;
+  cluster->button->on_press       = switch_cluster_on_button_press;
+  cluster->button->on_release     = switch_cluster_on_button_release;
+  cluster->button->on_long_press  = switch_cluster_on_button_long_press;
+  cluster->button->on_multi_press = switch_cluster_on_button_multi_press;
   cluster->button->callback_param = cluster;
 
   SETUP_ATTR(0, ZCL_ATTRID_ONOFF_CONFIGURATION_SWITCH_TYPE, ZCL_DATA_TYPE_ENUM8, ACCESS_CONTROL_READ, cluster->button->mode); // only read because of zcl switch type is strict in lib
@@ -69,7 +69,7 @@ void switch_cluster_add_to_endpoint(zigbee_switch_cluster *cluster, zigbee_endpo
   zcl_specClusterInfo_t *info_conf = zigbee_endpoint_reserve_info(endpoint);
   info_conf->clusterId           = ZCL_CLUSTER_GEN_ON_OFF_SWITCH_CONFIG;
   info_conf->manuCode            = MANUFACTURER_CODE_NONE;
-  info_conf->attrNum             = 10;
+  info_conf->attrNum             = ZCL_ATTR_COUNT;
   info_conf->attrTbl             = cluster->attr_infos;
   info_conf->clusterRegisterFunc = zcl_onoff_configuration_register;
   info_conf->clusterAppCb        = switch_cluster_callback_trampoline;
@@ -206,12 +206,14 @@ void switch_cluster_binding_action_off(zigbee_switch_cluster *cluster) {
       zcl_onOff_onCmd(cluster->endpoint, &dstEpInfo, false);
       break;
     case ZCL_ONOFF_CONFIGURATION_SWITCH_ACTION_TOGGLE_SIMPLE:
-      if (cluster->button->mode != ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY) {
+      if (cluster->button->mode != ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY &&
+          cluster->button->mode != ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY_INVERSE) {
         zcl_onOff_toggleCmd(cluster->endpoint, &dstEpInfo, false);
       }
       break;
     case ZCL_ONOFF_CONFIGURATION_SWITCH_ACTION_TOGGLE_SMART_SYNC:
-      if (cluster->button->mode != ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY) {
+      if (cluster->button->mode != ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY &&
+          cluster->button->mode != ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY_INVERSE) {
         if (relay_cluster->relay->on) {
           zcl_onOff_onCmd(cluster->endpoint, &dstEpInfo, false);
         } else {
@@ -220,8 +222,8 @@ void switch_cluster_binding_action_off(zigbee_switch_cluster *cluster) {
       }
       break;
     case ZCL_ONOFF_CONFIGURATION_SWITCH_ACTION_TOGGLE_SMART_OPPOSITE:
-      if (cluster->button->mode != ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY)
-      {
+      if (cluster->button->mode != ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY &&
+          cluster->button->mode != ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY_INVERSE) {
         if (relay_cluster->relay->on) {
           zcl_onOff_offCmd(cluster->endpoint, &dstEpInfo, false);
         } else{
@@ -334,7 +336,7 @@ void switch_cluster_on_button_multi_press(zigbee_switch_cluster *cluster, u8 pre
     case MULTI_PRESS_BOTH: // 253 BOTH
       cluster->multistate_state = MULTISTATE_BOTH_PRESS;
       break;
-    case MULTI_PRESS_BOTH_HOLD: // 253 BOTH
+    case MULTI_PRESS_BOTH_HOLD: // 254 BOTH_HOLD
       cluster->multistate_state = MULTISTATE_BOTH_HOLD;
       break;
     default:

@@ -9,6 +9,8 @@
 #include "base_components/button.h"
 #include "custom_zcl/zcl_onoff_configuration.h"
 
+#define ZCL_ATTR_COUNT 10
+
 #define MULTI_PRESS_CNT_TO_RESET    10
 #define MULTI_PRESS_BOTH            253
 #define MULTI_PRESS_BOTH_HOLD       254
@@ -34,7 +36,7 @@ typedef struct
   u8            relay_index;
   u8            binded_mode;
   button_t *    button;
-  zclAttrInfo_t attr_infos[10];
+  zclAttrInfo_t attr_infos[ZCL_ATTR_COUNT];
   u16           multistate_state;
   zclAttrInfo_t multistate_attr_infos[4];
 } zigbee_switch_cluster;
