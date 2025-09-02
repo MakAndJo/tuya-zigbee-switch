@@ -346,7 +346,7 @@ void switch_cluster_on_button_multi_press(zigbee_switch_cluster *cluster, u8 pre
 
   zigbee_relay_cluster *relay_cluster = &relay_clusters[cluster->relay_index - 1];
 
-  if (cluster->multistate_state == MULTISTATE_BOTH_PRESS) {
+  if (cluster->multistate_state == MULTISTATE_BOTH_RELEASE) {
     switch (cluster->both_press_action) {
       case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION_ONOFF:
         relay_cluster_on(relay_cluster);

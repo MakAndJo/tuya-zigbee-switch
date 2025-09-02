@@ -56,8 +56,7 @@ void init_gpio_output(GPIO_PinTypeDef pin);
 
 
 
-void onResetClicked(void *_)
-{
+void onResetClicked(void *_) {
   factoryReset();
 }
 
@@ -160,7 +159,7 @@ void parse_config()
 
       switch_clusters[switch_clusters_cnt].switch_idx  = switch_clusters_cnt;
       switch_clusters[switch_clusters_cnt].both_press_action = ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION_TOGGLE;
-      switch_clusters[switch_clusters_cnt].both_hold_action = ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION_NONE;
+      switch_clusters[switch_clusters_cnt].both_hold_action = ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION_OFFON;
       switch_clusters[switch_clusters_cnt].action = ZCL_ONOFF_CONFIGURATION_SWITCH_ACTION_TOGGLE_SIMPLE;
       switch_clusters[switch_clusters_cnt].relay_mode  = ZCL_ONOFF_CONFIGURATION_RELAY_MODE_SHORT;
       switch_clusters[switch_clusters_cnt].binded_mode = ZCL_ONOFF_CONFIGURATION_BINDED_MODE_LONG;
@@ -245,55 +244,65 @@ void parse_config()
 }
 
 
-void periferals_init()
-{
-  for (int index = 0; index < buttons_cnt; index++)
-  {
-    btn_init(&buttons[index]);
-  }
+void periferals_init() {
+  for (int index = 0; index < buttons_cnt; index++) btn_init(&buttons[index]);
 }
 
-static u8 both_sent = 0;
-static u8 both_hold_sent = 0;
 void periferals_update() {
-  for (int index = 0; index < leds_cnt; index++) {
-    led_update(&leds[index]);
-  }
-  for (int index = 0; index < buttons_cnt; index++) {
-    btn_update(&buttons[index]);
-  }
+  for (int index = 0; index < leds_cnt; index++) led_update(&leds[index]);
+  for (int index = 0; index < buttons_cnt; index++) btn_update(&buttons[index]);
+  both_btn_update();
+}
 
-  if (switch_clusters_cnt >= 2) {
-    button_t *btnA = switch_clusters[0].button;
-    button_t *btnB = switch_clusters[1].button;
-    if (btnA && btnB) {
-      if (btnA->pressed && btnB->pressed) {
-        if (!both_sent) {
-          both_sent = 1;
-          printf("BOTH pressed!\r\n");
-          if (btnA->on_multi_press) {
-            btnA->on_multi_press(btnA->callback_param, MULTI_PRESS_BOTH); // 253 BOTH
-          }
-          if (btnB->on_multi_press) {
-            btnB->on_multi_press(btnB->callback_param, MULTI_PRESS_BOTH); // 253 BOTH
-          }
-        }
-        if (!both_hold_sent && btnA->long_pressed && btnB->long_pressed) {
-          both_hold_sent = 1;
-          printf("BOTH hold!\r\n");
-          if (btnA->on_multi_press) {
-            btnA->on_multi_press(btnA->callback_param, MULTI_PRESS_BOTH_HOLD); // 254 BOTH_HOLD
-          }
-          if (btnB->on_multi_press) {
-            btnB->on_multi_press(btnB->callback_param, MULTI_PRESS_BOTH_HOLD); // 254 BOTH_HOLD
-          }
-        }
-      } else {
-        both_sent = 0;
-        both_hold_sent = 0;
+static u8 both_pressed = 0;
+static u8 both_press_sent = 0;
+static u8 both_release_sent = 0;
+static u8 both_hold_sent = 0;
+
+void both_btn_update() {
+  if (switch_clusters_cnt < 2) return;
+  button_t *btnA = switch_clusters[0].button;
+  button_t *btnB = switch_clusters[1].button;
+  if (!btnA || !btnB) return;
+
+  if (btnA->pressed && btnB->pressed) { // BOTH PRESSED
+    both_pressed = 1;
+    if (!both_press_sent) {
+      both_press_sent = 1;
+      printf("BOTH pressed!\r\n");
+      if (btnA->on_multi_press) btnA->on_multi_press(btnA->callback_param, MULTI_PRESS_BOTH); // 253 BOTH
+      if (btnB->on_multi_press) btnB->on_multi_press(btnB->callback_param, MULTI_PRESS_BOTH); // 253 BOTH
+      return;
+    }
+    if (btnA->long_pressed && btnB->long_pressed) { // BOTH LONG PRESSED
+      if (!both_hold_sent) {
+        both_hold_sent = 1;
+        printf("BOTH hold!\r\n");
+        if (btnA->on_multi_press) btnA->on_multi_press(btnA->callback_param, MULTI_PRESS_BOTH_HOLD); // 254 BOTH_HOLD
+        if (btnB->on_multi_press) btnB->on_multi_press(btnB->callback_param, MULTI_PRESS_BOTH_HOLD); // 254 BOTH_HOLD
+        return;
       }
     }
+    return;
   }
+
+  if (both_pressed && !btnA->pressed && !btnB->pressed) { // BOTH RELEASED
+    both_pressed = 0;
+    if (!both_release_sent) {
+      both_release_sent = 1;
+      printf("BOTH release!\r\n");
+      if (btnA->on_multi_press) btnA->on_multi_press(btnA->callback_param, MULTI_PRESS_BOTH_RELEASE); // 250 BOTH_RELEASE
+      if (btnB->on_multi_press) btnB->on_multi_press(btnB->callback_param, MULTI_PRESS_BOTH_RELEASE); // 250 BOTH_RELEASE
+    }
+    return;
+  }
+
+  // RESET
+  both_pressed = 0;
+  both_press_sent = 0;
+  both_release_sent = 0;
+  both_hold_sent = 0;
+  return;
 }
 
 void init_reporting()

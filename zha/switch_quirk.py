@@ -249,6 +249,7 @@ for config in CONFIGS:
                     3: "triple",
                     4: "quadruple",
                     5: "quintuple",
+                    200: "both_release",
                     201: "both",
                     202: "both_hold",
                 }[int(x)]
