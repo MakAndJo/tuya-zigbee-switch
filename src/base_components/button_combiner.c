@@ -18,6 +18,8 @@ void both_btn_update(button_t *btnA, button_t *btnB) {
     if (!both_press_sent) {
       both_press_sent = 1;
       printf("BOTH pressed!\r\n");
+      btnA->event_count = 0;
+      btnB->event_count = 0;
 			btn_push_event(btnA, EV_MULTI, MULTI_PRESS_BOTH); // 253 BOTH
 			btn_push_event(btnB, EV_MULTI, MULTI_PRESS_BOTH);
       return;
@@ -26,6 +28,8 @@ void both_btn_update(button_t *btnA, button_t *btnB) {
       if (!both_hold_sent) {
 				both_hold_sent = 1;
         printf("BOTH hold!\r\n");
+        btnA->event_count = 0;
+        btnB->event_count = 0;
 				btn_push_event(btnA, EV_MULTI, MULTI_PRESS_BOTH_HOLD); // 254 BOTH_HOLD
 				btn_push_event(btnB, EV_MULTI, MULTI_PRESS_BOTH_HOLD);
         return;
@@ -39,6 +43,8 @@ void both_btn_update(button_t *btnA, button_t *btnB) {
     if (!both_release_sent) {
 			both_release_sent = 1;
       printf("BOTH release!\r\n");
+      btnA->event_count = 0;
+      btnB->event_count = 0;
 			btn_push_event(btnA, EV_MULTI, MULTI_PRESS_BOTH_RELEASE); // 250 BOTH_RELEASE
 			btn_push_event(btnB, EV_MULTI, MULTI_PRESS_BOTH_RELEASE);
     }
@@ -50,5 +56,4 @@ void both_btn_update(button_t *btnA, button_t *btnB) {
   both_press_sent = 0;
   both_release_sent = 0;
   both_hold_sent = 0;
-  return;
 }

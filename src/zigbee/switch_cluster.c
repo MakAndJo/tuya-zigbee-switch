@@ -237,7 +237,7 @@ void switch_cluster_binding_action_off(zigbee_switch_cluster *cluster) {
 /// --- SWITCH ACTIONS --- ///
 
 void switch_cluster_on_button_press(zigbee_switch_cluster *cluster) {
-  if (cluster->multistate_state == MULTISTATE_BOTH_PRESS) return;
+  if (cluster->multistate_state == MULTISTATE_BOTH_PRESS) return; // never
   if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE ||
     cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE_INVERSE)
   {
@@ -277,6 +277,7 @@ void switch_cluster_on_button_release(zigbee_switch_cluster *cluster)
   }
 
   if (cluster->multistate_state == MULTISTATE_PRESS ||
+      cluster->multistate_state == MULTISTATE_HOLD ||
       cluster->multistate_state == MULTISTATE_RELEASE)
   {
     if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_SHORT) {
@@ -294,7 +295,8 @@ void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster) {
   if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE ||
       cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE_INVERSE) return;
   if (cluster->multistate_state == MULTISTATE_BOTH_PRESS ||
-      cluster->multistate_state == MULTISTATE_BOTH_HOLD) return;
+      cluster->multistate_state == MULTISTATE_BOTH_HOLD ||
+      cluster->multistate_state == MULTISTATE_BOTH_RELEASE) return; // never
 
   if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_LONG) {
     switch_cluster_relay_action_on(cluster);
@@ -309,7 +311,7 @@ void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster) {
 
 void switch_cluster_on_button_multi_press(zigbee_switch_cluster *cluster, u8 press_count) {
   switch (press_count) {
-    case 1: // unused
+    case 1: // never
       cluster->multistate_state = MULTISTATE_PRESS;
       break;
     case 2:
