@@ -6,7 +6,7 @@
 typedef void (*ev_button_callback_t)(void *);
 typedef void (*ev_button_multi_press_callback_t)(void *param, u8 press_cnt);
 
-#define BTN_MAX_EVENTS 4
+#define BTN_MAX_EVENTS 2
 
 #define ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE                  0x00
 #define ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY               0x01
