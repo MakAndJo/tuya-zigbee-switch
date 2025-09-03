@@ -12,6 +12,7 @@ static void tick_once(void) {
     stub_clock_advance(1);
     millis_update();
     btn_update(&btn);
+    btn_emit_events(&btn);
 }
 
 static void simulate_time_ms(u32 ms) {
@@ -20,7 +21,7 @@ static void simulate_time_ms(u32 ms) {
 
 static void press_for(u32 ms){
     gpio_state[btn.pin] = 0;
-    tick_once();             
+    tick_once();
     simulate_time_ms(ms);
 }
 
@@ -92,7 +93,7 @@ void test_simple_press_release(void){
 }
 
 void test_debounce_for_press(void){
-  
+
     for (int i = 0; i < 10; i++) {
         press_for(5);
         release_for(5);
