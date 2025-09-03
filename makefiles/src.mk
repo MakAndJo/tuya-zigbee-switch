@@ -35,6 +35,7 @@ $(BUILD_PATH)/$(SRC_DIR)/main.o \
 $(BUILD_PATH)/$(SRC_DIR)/ext_ota.o \
 $(BUILD_PATH)/$(SRC_DIR)/reporting.o \
 $(BUILD_PATH)/$(SRC_DIR)/base_components/button.o \
+$(BUILD_PATH)/$(SRC_DIR)/base_components/button_combiner.o \
 $(BUILD_PATH)/$(SRC_DIR)/base_components/led.o \
 $(BUILD_PATH)/$(SRC_DIR)/base_components/millis.o \
 $(BUILD_PATH)/$(SRC_DIR)/base_components/relay.o \
@@ -46,7 +47,7 @@ $(BUILD_PATH)/$(SRC_DIR)/device_config/version_nv.o
 $(BUILD_PATH)/$(SRC_DIR)/%.o: $(PROJECT_PATH)/$(SRC_DIR)/%.c
 	@echo 'Building file: $<'
 	@$(CC) $(GCC_FLAGS) $(INCLUDE_PATHS) -c -o"$@" "$<"
-	
+
 $(BUILD_PATH)/$(SRC_DIR)/%.o: $(PROJECT_PATH)/$(SRC_DIR)/%.S
 	@echo 'Building file: $<'
 	@$(CC) $(GCC_FLAGS) $(ASM_FLAGS) $(INCLUDE_PATHS) -c -o"$@" "$<"
