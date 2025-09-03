@@ -1,10 +1,13 @@
 TEST_NAME         := button
 TEST_SOURCES      := tests/button/test_button.c \
+                     tests/button/test_button_both.c \
                      tests/test_main.c
 # modules under test (real code)
-UNDER_TEST        := src/base_components/button.c src/base_components/millis.c
+UNDER_TEST        := src/base_components/button.c \
+                     src/base_components/millis.c \
+                     src/base_components/button_combiner.c
 # real deps (if they’re harmless on host)
-REAL_DEPS         := 
+REAL_DEPS         :=
 # stubs/fakes replacing heavy deps
 STUBS             := tests/stubs/gpio.c tests/stubs/clock.c
 
