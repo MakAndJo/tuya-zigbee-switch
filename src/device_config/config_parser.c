@@ -252,6 +252,7 @@ void periferals_update() {
   for (int index = 0; index < leds_cnt; index++) led_update(&leds[index]);
   for (int index = 0; index < buttons_cnt; index++) btn_update(&buttons[index]);
   both_btn_update();
+  for (int index = 0; index < buttons_cnt; index++) btn_emit_events(&buttons[index]);
 }
 
 static u8 both_pressed = 0;

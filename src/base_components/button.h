@@ -4,7 +4,9 @@
 #include "types.h"
 
 typedef void (*ev_button_callback_t)(void *);
-typedef void (*ev_button_multi_press_callback_t)(void *param, u8 *press_cnt);
+typedef void (*ev_button_multi_press_callback_t)(void *param, u8 press_cnt);
+
+#define BTN_MAX_EVENTS 4
 
 #define ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE                  0x00
 #define ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY               0x01
@@ -13,6 +15,11 @@ typedef void (*ev_button_multi_press_callback_t)(void *param, u8 *press_cnt);
 #define ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY_INVERSE       0x11 // momentary inverse
 
 #define DEBOUNCE_DELAY_MS 50
+
+typedef struct {
+  enum {EV_PRESS, EV_RELEASE, EV_LONG, EV_MULTI} type;
+  u8 param;
+} button_event_t;
 
 typedef struct
 {
@@ -32,10 +39,13 @@ typedef struct
   ev_button_callback_t             on_release;
   ev_button_multi_press_callback_t on_multi_press;
   void *                           callback_param;
+  button_event_t                   event_queue[BTN_MAX_EVENTS];
+  u32                              event_count;
 }button_t;
 
 
 void btn_init(button_t *button);
 void btn_update(button_t *button);
+void btn_emit_events(button_t *btn);
 
 #endif
