@@ -16,7 +16,7 @@
 #define MULTI_PRESS_BOTH_RELEASE    250
 #define MULTI_PRESS_BOTH_HOLD       254
 
-#define MULTISTATE_NOT_PRESSED      0
+#define MULTISTATE_RELEASE          0
 #define MULTISTATE_PRESS            1
 #define MULTISTATE_HOLD             128
 #define MULTISTATE_DOUBLE_PRESS     2

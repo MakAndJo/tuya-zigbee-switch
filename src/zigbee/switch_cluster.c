@@ -276,7 +276,7 @@ void switch_cluster_on_button_release(zigbee_switch_cluster *cluster)
   }
 
   if (cluster->multistate_state == MULTISTATE_PRESS ||
-      cluster->multistate_state == MULTISTATE_NOT_PRESSED)
+      cluster->multistate_state == MULTISTATE_RELEASE)
   {
     if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_SHORT) {
       switch_cluster_relay_action_on(cluster);
@@ -284,29 +284,22 @@ void switch_cluster_on_button_release(zigbee_switch_cluster *cluster)
     if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_SHORT) {
       switch_cluster_binding_action_on(cluster);
     }
+    cluster->multistate_state = MULTISTATE_RELEASE;
+    switch_cluster_report_action(cluster);
   }
-
-  cluster->multistate_state = MULTISTATE_NOT_PRESSED;
-  switch_cluster_report_action(cluster);
 }
 
 void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster) {
   if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE ||
-      cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE_INVERSE)
-  {
-    // Toggle does not support modes (RISE, SHORT, LONG)
-    return;
-  }
+      cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE_INVERSE) return;
+  if (cluster->multistate_state == MULTISTATE_BOTH_PRESS ||
+      cluster->multistate_state == MULTISTATE_BOTH_HOLD) return;
 
-  if (cluster->multistate_state != MULTISTATE_BOTH_PRESS &&
-      cluster->multistate_state != MULTISTATE_BOTH_HOLD)
-  {
-    if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_LONG) {
-      switch_cluster_relay_action_on(cluster);
-    }
-    if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_LONG) {
-      switch_cluster_binding_action_on(cluster);
-    }
+  if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_LONG) {
+    switch_cluster_relay_action_on(cluster);
+  }
+  if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_LONG) {
+    switch_cluster_binding_action_on(cluster);
   }
 
   cluster->multistate_state = MULTISTATE_HOLD;
@@ -333,7 +326,10 @@ void switch_cluster_on_button_multi_press(zigbee_switch_cluster *cluster, u8 pre
     case MULTI_PRESS_CNT_TO_RESET:
       return factoryReset();
       break;
-    case MULTI_PRESS_BOTH: // 253 BOTH
+    case MULTI_PRESS_BOTH_RELEASE: // 250 BOTH_RELEASE
+      cluster->multistate_state = MULTISTATE_BOTH_RELEASE;
+      break;
+    case MULTI_PRESS_BOTH: // 252 BOTH
       cluster->multistate_state = MULTISTATE_BOTH_PRESS;
       break;
     case MULTI_PRESS_BOTH_HOLD: // 254 BOTH_HOLD
