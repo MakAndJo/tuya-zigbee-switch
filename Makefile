@@ -235,31 +235,33 @@ clean_z2m_index:
 
 update_converters:
 	python3 helper_scripts/make_z2m_tuya_converters.py device_db.yaml \
-		> zigbee2mqtt/converters/tuya_with_ota.js 
+		> zigbee2mqtt/converters/tuya_with_ota.js
 	python3 helper_scripts/make_z2m_tuya_converters.py --z2m-v1 device_db.yaml \
-		> zigbee2mqtt/converters_v1/tuya_with_ota.js 
+		> zigbee2mqtt/converters_v1/tuya_with_ota.js
 	python3 helper_scripts/make_z2m_custom_converters.py device_db.yaml \
-		> zigbee2mqtt/converters/switch_custom.js 
+		> zigbee2mqtt/converters/switch_custom.js
 	python3 helper_scripts/make_z2m_custom_converters.py --z2m-v1 device_db.yaml \
-		> zigbee2mqtt/converters_v1/switch_custom.js 
+		> zigbee2mqtt/converters_v1/switch_custom.js
 
 update_zha_quirk:
 	python3 helper_scripts/make_zha_quirk.py device_db.yaml > zha/switch_quirk.py
 
 
 update_supported_devices:
-	python3 helper_scripts/make_supported_devices.py device_db.yaml > docs/supported_devices.md 
+	python3 helper_scripts/make_supported_devices.py device_db.yaml > docs/supported_devices.md
 
 
 freeze_ota_links:
-	sed -i "s/refs\/heads\/$(shell git branch --show-current)/$(shell git rev-parse HEAD)/g" zigbee2mqtt/ota/*.json 
+	sed -i "s/refs\/heads\/$(shell git branch --show-current)/$(shell git rev-parse HEAD)/g" zigbee2mqtt/ota/*.json
+	git add zigbee2mqtt/ota/*.json
+	git commit -m "freeze ota links"
 
 
 debug:
 	@echo $(GCC_FLAGS)
 
 
-secondary-outputs: $(BIN_FILE) $(OTA_FILE) $(LST_FILE) z2m_index z2m_index_force sizedummy 
+secondary-outputs: $(BIN_FILE) $(OTA_FILE) $(LST_FILE) z2m_index z2m_index_force sizedummy
 
 
 
@@ -277,7 +279,7 @@ sdk:
 
 toolchain:
 	mkdir -p $(TOOLCHAIN_DIR)
-	wget -P $(TOOLCHAIN_DIR) http://shyboy.oss-cn-shenzhen.aliyuncs.com/readonly/tc32_gcc_v2.0.tar.bz2 
+	wget -P $(TOOLCHAIN_DIR) http://shyboy.oss-cn-shenzhen.aliyuncs.com/readonly/tc32_gcc_v2.0.tar.bz2
 	tar -xvjf $(TOOLCHAIN_DIR)/tc32_gcc_v2.0.tar.bz2 -C $(TOOLCHAIN_DIR)
 
 
