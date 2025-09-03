@@ -263,9 +263,9 @@ void switch_cluster_on_button_press(zigbee_switch_cluster *cluster) {
 }
 
 void switch_cluster_on_button_release(zigbee_switch_cluster *cluster) {
-    if (cluster->multistate_state != MULTISTATE_PRESS &&
-      cluster->multistate_state != MULTISTATE_HOLD &&
-      cluster->multistate_state != MULTISTATE_RELEASE) return;
+  if (cluster->multistate_state == MULTISTATE_BOTH_PRESS ||
+      cluster->multistate_state == MULTISTATE_BOTH_HOLD ||
+      cluster->multistate_state == MULTISTATE_BOTH_RELEASE) return; // never
 
   if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE ||
       cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE_INVERSE)
