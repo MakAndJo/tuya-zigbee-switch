@@ -310,6 +310,45 @@ void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster) {
 }
 
 void switch_cluster_on_button_multi_press(zigbee_switch_cluster *cluster, u8 press_count) {
+
+  zigbee_relay_cluster *relay_cluster = &relay_clusters[cluster->relay_index - 1];
+
+  if (cluster->multistate_state == MULTISTATE_BOTH_PRESS &&
+      press_count == MULTI_PRESS_BOTH_HOLD)
+  { // hold after press
+    switch (cluster->both_hold_action) {
+      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION_ONOFF:
+        relay_cluster_on(relay_cluster);
+        break;
+      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION_OFFON:
+        relay_cluster_off(relay_cluster);
+        break;
+      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION_TOGGLE:
+        relay_cluster_toggle(relay_cluster);
+        break;
+      default:
+        break;
+    }
+  }
+
+  if (cluster->multistate_state == MULTISTATE_BOTH_PRESS &&
+      press_count == MULTI_PRESS_BOTH_RELEASE)
+  { // release after press
+    switch (cluster->both_press_action) {
+      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION_ONOFF:
+        relay_cluster_on(relay_cluster);
+        break;
+      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION_OFFON:
+        relay_cluster_off(relay_cluster);
+        break;
+      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION_TOGGLE:
+        relay_cluster_toggle(relay_cluster);
+        break;
+      default:
+        break;
+    }
+  }
+
   switch (press_count) {
     case 1: // never
       cluster->multistate_state = MULTISTATE_PRESS;
@@ -330,7 +369,7 @@ void switch_cluster_on_button_multi_press(zigbee_switch_cluster *cluster, u8 pre
       return factoryReset();
       break;
     case MULTI_PRESS_BOTH_RELEASE: // 250 BOTH_RELEASE
-      cluster->multistate_state = MULTISTATE_BOTH_RELEASE;
+      cluster->multistate_state = MULTISTATE_RELEASE; // skip both_release
       break;
     case MULTI_PRESS_BOTH: // 252 BOTH
       cluster->multistate_state = MULTISTATE_BOTH_PRESS;
@@ -341,40 +380,6 @@ void switch_cluster_on_button_multi_press(zigbee_switch_cluster *cluster, u8 pre
     default:
       cluster->multistate_state = MULTISTATE_PRESS;
       break;
-  }
-
-  zigbee_relay_cluster *relay_cluster = &relay_clusters[cluster->relay_index - 1];
-
-  if (cluster->multistate_state == MULTISTATE_BOTH_RELEASE) {
-    switch (cluster->both_press_action) {
-      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION_ONOFF:
-        relay_cluster_on(relay_cluster);
-        break;
-      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION_OFFON:
-        relay_cluster_off(relay_cluster);
-        break;
-      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_PRESS_ACTION_TOGGLE:
-        relay_cluster_toggle(relay_cluster);
-        break;
-      default:
-        break;
-    }
-  }
-
-  if (cluster->multistate_state == MULTISTATE_BOTH_HOLD) {
-    switch (cluster->both_hold_action) {
-      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION_ONOFF:
-        relay_cluster_on(relay_cluster);
-        break;
-      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION_OFFON:
-        relay_cluster_off(relay_cluster);
-        break;
-      case ZCL_ONOFF_CONFIGURATION_SWITCH_BOTH_HOLD_ACTION_TOGGLE:
-        relay_cluster_toggle(relay_cluster);
-        break;
-      default:
-        break;
-    }
   }
 
   switch_cluster_report_action(cluster);
