@@ -12,7 +12,7 @@ void btn_push_event(button_t *btn, int type, u8 param) {
 }
 
 void btn_emit_events(button_t *btn) {
-  for (int i = 0; i < btn->event_count; i++) {
+  for (u32 i = 0; i < btn->event_count; i++) {
     button_event_t *e = &btn->event_queue[i];
     switch(e->type) {
       case EV_PRESS:   if (btn->on_press) btn->on_press(btn->callback_param); break;

@@ -14,6 +14,11 @@ typedef void (*ev_button_multi_press_callback_t)(void *param, u8 press_cnt);
 #define ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE_INVERSE          0x10 // toggle inverse
 #define ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY_INVERSE       0x11 // momentary inverse
 
+#define MULTI_PRESS_CNT_TO_RESET    10
+#define MULTI_PRESS_BOTH            252
+#define MULTI_PRESS_BOTH_RELEASE    250
+#define MULTI_PRESS_BOTH_HOLD       254
+
 #define DEBOUNCE_DELAY_MS 50
 
 typedef struct {
@@ -46,6 +51,7 @@ typedef struct
 
 void btn_init(button_t *button);
 void btn_update(button_t *button);
+void btn_push_event(button_t *btn, int type, u8 param);
 void btn_emit_events(button_t *btn);
 
 #endif

@@ -7,14 +7,10 @@
 
 #include "endpoint.h"
 #include "base_components/button.h"
+#include "base_components/button_combiner.h"
 #include "custom_zcl/zcl_onoff_configuration.h"
 
 #define ZCL_ATTR_COUNT 10
-
-#define MULTI_PRESS_CNT_TO_RESET    10
-#define MULTI_PRESS_BOTH            252
-#define MULTI_PRESS_BOTH_RELEASE    250
-#define MULTI_PRESS_BOTH_HOLD       254
 
 #define MULTISTATE_RELEASE          0
 #define MULTISTATE_PRESS            1
