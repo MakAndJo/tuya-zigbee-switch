@@ -1,12 +1,12 @@
 [
   {
-    "fileName": "1141-aa01-01033014-tlc_switch.zigbee",
-    "fileVersion": 16986132,
+    "fileName": "1141-aa01-0103301e-tlc_switch.zigbee",
+    "fileVersion": 16986142,
     "fileSize": 132530,
-    "url": "https://github.com/MakAndJo/tuya-zigbee-switch/raw/7c7a06ce1d8aa93ed80b66a7931b19e58481945b/bin/TS0012_END_DEVICE/1141-aa01-01033014-tlc_switch.zigbee",
+    "url": "https://github.com/MakAndJo/tuya-zigbee-switch/raw/refs/heads/main/bin/TS0012_END_DEVICE/1141-aa01-0103301e-tlc_switch.zigbee",
     "imageType": 43521,
     "manufacturerCode": 4417,
-    "sha512": "f937782ebc07977ea3d0b5a144648b07bcecf64d02751b3a21bbbead40c9710652a0ec84025b40caafad7e6cb53648555544f67196b124e047389a934b342650",
+    "sha512": "56abe4cdf7a439b648649f80e21ff5b25c3c52e2ef6409886552d365dc68fcf8fcd7a00f0fde7b0b8fa53da76a32768634f5c8ae65dfab77e812b00b67ac5faf",
     "otaHeaderString": "Telink Zigbee OTA\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZ3000_jl7qyupf",
@@ -19,10 +19,10 @@
     "fileName": "1141-d3a3-ffffffff-tlc_switch-from_tuya.zigbee",
     "fileVersion": 4294967295,
     "fileSize": 132530,
-    "url": "https://github.com/MakAndJo/tuya-zigbee-switch/raw/7c7a06ce1d8aa93ed80b66a7931b19e58481945b/bin/TS0012_END_DEVICE/1141-d3a3-ffffffff-tlc_switch-from_tuya.zigbee",
+    "url": "https://github.com/MakAndJo/tuya-zigbee-switch/raw/refs/heads/main/bin/TS0012_END_DEVICE/1141-d3a3-ffffffff-tlc_switch-from_tuya.zigbee",
     "imageType": 54179,
     "manufacturerCode": 4417,
-    "sha512": "49e8477b36d0246e4fc5c14ecc2685bd9584d2e4454cc12040742f3a97f14e577008e29c4c29d73642c0595a28d16e66a4f8d7e6f3df8cae95d59f16ef7bea34",
+    "sha512": "5d144e7ac959fa3fb3f1f7b524d162836f0c0f3775b3887715a37deefe63d5ea182547123776ef367fb17a608729801c38e45498009bfa0a99d4f495ee004cb6",
     "otaHeaderString": "Telink Zigbee OTA\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZ3000_jl7qyupf",
