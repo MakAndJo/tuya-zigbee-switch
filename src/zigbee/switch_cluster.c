@@ -262,8 +262,10 @@ void switch_cluster_on_button_press(zigbee_switch_cluster *cluster) {
   }
 }
 
-void switch_cluster_on_button_release(zigbee_switch_cluster *cluster)
-{
+void switch_cluster_on_button_release(zigbee_switch_cluster *cluster) {
+    if (cluster->multistate_state != MULTISTATE_PRESS &&
+      cluster->multistate_state != MULTISTATE_HOLD &&
+      cluster->multistate_state != MULTISTATE_RELEASE) return;
 
   if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE ||
       cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE_INVERSE)
@@ -276,19 +278,17 @@ void switch_cluster_on_button_release(zigbee_switch_cluster *cluster)
     return;
   }
 
-  if (cluster->multistate_state == MULTISTATE_PRESS ||
-      cluster->multistate_state == MULTISTATE_HOLD ||
-      cluster->multistate_state == MULTISTATE_RELEASE)
-  {
+  if (cluster->multistate_state == MULTISTATE_PRESS) {
     if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_SHORT) {
       switch_cluster_relay_action_on(cluster);
     }
     if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_SHORT) {
       switch_cluster_binding_action_on(cluster);
     }
-    cluster->multistate_state = MULTISTATE_RELEASE;
-    switch_cluster_report_action(cluster);
   }
+
+  cluster->multistate_state = MULTISTATE_RELEASE;
+  switch_cluster_report_action(cluster);
 }
 
 void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster) {
