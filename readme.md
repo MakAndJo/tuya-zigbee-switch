@@ -1,6 +1,3 @@
-[![GitHub stars](https://img.shields.io/github/stars/romasku/tuya-zigbee-switch.svg?style=flat&label=Stars&color=yellow)](https://github.com/romasku/tuya-zigbee-switch/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/romasku/tuya-zigbee-switch.svg?label=Issues)](https://github.com/romasku/tuya-zigbee-switch/issues)
-[![Discord](https://img.shields.io/discord/1405486711412359278.svg?logo=discord&logoColor=white&label=Chat&color=blue)](https://discord.gg/4HAg2Fr565)
 
 
 # 🔓 Custom firmware for Telink Tuya switches
