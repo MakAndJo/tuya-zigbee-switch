@@ -10,7 +10,7 @@
 #include "base_components/button_combiner.h"
 #include "custom_zcl/zcl_onoff_configuration.h"
 
-#define ZCL_ATTR_COUNT 10
+#define ZCL_ATTR_COUNT 11
 
 #define MULTISTATE_RELEASE          0
 #define MULTISTATE_PRESS            1
@@ -37,18 +37,20 @@ typedef struct
   zclAttrInfo_t attr_infos[ZCL_ATTR_COUNT];
   u16           multistate_state;
   zclAttrInfo_t multistate_attr_infos[4];
+  move_t *      level_move;
 } zigbee_switch_cluster;
 
 typedef struct
 {
-  u8  action;
-  u8  both_press_action;
-  u8  both_hold_action;
-  u8  relay_mode;
-  u8  relay_index;
-  u16 button_long_press_duration;
-  u8 button_mode;
-  u8 binded_mode;
+  u8            action;
+  u8            both_press_action;
+  u8            both_hold_action;
+  u8            relay_mode;
+  u8            relay_index;
+  u16           button_long_press_duration;
+  u8            button_mode;
+  u8            binded_mode;
+  u8            level_move_rate;
 } zigbee_switch_cluster_config;
 
 void switch_cluster_add_to_endpoint(zigbee_switch_cluster *cluster, zigbee_endpoint *endpoint);

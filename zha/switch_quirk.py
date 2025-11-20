@@ -95,6 +95,13 @@ class CustomOnOffConfigurationCluster(CustomCluster, OnOffConfiguration):
             is_manufacturer_specific=True,
         )
 
+        level_move_rate = ZCLAttributeDef(
+            id=t.uint16_t(0xff06),
+            type=t.uint8_t,
+            access=(ZCLAttributeAccess.Read | ZCLAttributeAccess.Write),
+            is_manufacturer_specific=True,
+        )
+
         both_press_action = ZCLAttributeDef(
             id=t.uint16_t(0xff07),
             type=BothHoldAction,
@@ -108,6 +115,7 @@ class CustomOnOffConfigurationCluster(CustomCluster, OnOffConfiguration):
             access=(ZCLAttributeAccess.Read | ZCLAttributeAccess.Write),
             is_manufacturer_specific=True,
         )
+
 
 
 
@@ -179,16 +187,6 @@ for config in CONFIGS:
                 fallback_name=f"Relay mode {endpoint_id}",
                 endpoint_id=endpoint_id,
             )
-            .number(
-                CustomOnOffConfigurationCluster.AttributeDefs.relay_index.name,
-                CustomOnOffConfigurationCluster.cluster_id,
-                translation_key="relay_index",
-                fallback_name=f"Relay index {endpoint_id}",
-                endpoint_id=endpoint_id,
-                min_value=1,
-                max_value=relay_cnt,
-                step=1,
-            )
             .enum(
                 CustomOnOffConfigurationCluster.AttributeDefs.binded_mode.name,
                 BindedMode,
@@ -217,20 +215,14 @@ for config in CONFIGS:
                 max_value=5000,
                 step=1,
             )
-            .enum(
-                CustomOnOffConfigurationCluster.AttributeDefs.both_press_action.name,
-                BothPressAction,
+            .number(
+                CustomOnOffConfigurationCluster.AttributeDefs.level_move_rate.name,
                 CustomOnOffConfigurationCluster.cluster_id,
-                translation_key="both_press_action",
-                fallback_name=f"Both press action {endpoint_id}",
-                endpoint_id=endpoint_id,
-            )
-            .enum(
-                CustomOnOffConfigurationCluster.AttributeDefs.both_hold_action.name,
-                BothHoldAction,
-                CustomOnOffConfigurationCluster.cluster_id,
-                translation_key="both_hold_action",
-                fallback_name=f"Both hold action {endpoint_id}",
+                translation_key="level_move_rate_"+str(endpoint_id),
+                fallback_name="Level move rate "+str(endpoint_id),
+                min_value=1,
+                max_value=255,
+                step=1,
                 endpoint_id=endpoint_id,
             )
             .sensor(
@@ -255,6 +247,40 @@ for config in CONFIGS:
                 }[int(x)]
             )
         )
+        if (switch_cnt > 1):
+            builder = (
+                builder
+                .number(
+                    CustomOnOffConfigurationCluster.AttributeDefs.relay_index.name,
+                    CustomOnOffConfigurationCluster.cluster_id,
+                    translation_key="relay_index",
+                    fallback_name=f"Relay index {endpoint_id}",
+                    endpoint_id=endpoint_id,
+                    min_value=1,
+                    max_value=relay_cnt,
+                    step=1,
+                )
+            )
+        if (switch_cnt == 2):
+            builder = (
+                builder
+                .enum(
+                    CustomOnOffConfigurationCluster.AttributeDefs.both_press_action.name,
+                    BothPressAction,
+                    CustomOnOffConfigurationCluster.cluster_id,
+                    translation_key="both_press_action",
+                    fallback_name=f"Both press action {endpoint_id}",
+                    endpoint_id=endpoint_id,
+                )
+                .enum(
+                    CustomOnOffConfigurationCluster.AttributeDefs.both_hold_action.name,
+                    BothHoldAction,
+                    CustomOnOffConfigurationCluster.cluster_id,
+                    translation_key="both_hold_action",
+                    fallback_name=f"Both hold action {endpoint_id}",
+                    endpoint_id=endpoint_id,
+                )
+            )
 
 
 
