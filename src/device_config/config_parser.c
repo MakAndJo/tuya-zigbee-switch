@@ -153,7 +153,7 @@ void parse_config()
       init_gpio_input(pin, pull);
 
       buttons[buttons_cnt].pin = pin;
-      buttons[buttons_cnt].mode = ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY_INVERSE;
+      buttons[buttons_cnt].mode = ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_MOMENTARY;
       buttons[buttons_cnt].long_press_duration_ms = 600;
       buttons[buttons_cnt].multi_press_duration_ms = 200;
 
@@ -251,7 +251,7 @@ void periferals_init() {
 void periferals_update() {
   for (int index = 0; index < leds_cnt; index++) led_update(&leds[index]);
   for (int index = 0; index < buttons_cnt; index++) btn_update(&buttons[index]);
-  if (switch_clusters_cnt >= 2) {
+  if (switch_clusters_cnt == 2) {
     button_t *btnA = switch_clusters[0].button;
     button_t *btnB = switch_clusters[1].button;
     both_btn_update(btnA, btnB);

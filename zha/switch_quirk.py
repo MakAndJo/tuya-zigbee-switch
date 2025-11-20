@@ -18,7 +18,6 @@ class SwitchActions(t.enum8):
 class SwitchMode(t.enum8):
     Toggle = 0x00
     Momentary = 0x01
-    Multifunction = 0x02
     ToggleInverse = 0x10
     MomentaryInverse = 0x11
 
@@ -126,6 +125,7 @@ class CustomMultistateInputCluster(CustomCluster, MultistateInput):
 
 
 CONFIGS = [
+    "ji4araar;TS0011-custom;BA0f;LD7;SC2f;RC0;",
     "jl7qyupf;TS0012-custom;BA0f;LD7;SC2f;SC3f;RC0;RB4;",
 ]
 

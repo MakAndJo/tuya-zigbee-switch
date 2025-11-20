@@ -237,11 +237,11 @@ void switch_cluster_binding_action_off(zigbee_switch_cluster *cluster) {
 /// --- SWITCH ACTIONS --- ///
 
 void switch_cluster_on_button_press(zigbee_switch_cluster *cluster) {
-  if (cluster->multistate_state == MULTISTATE_BOTH_PRESS) return; // never
+  if (cluster->multistate_state == MULTISTATE_BOTH_PRESS) return; // never but avoid
+
   if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE ||
-    cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE_INVERSE)
-  {
-    // Toggle does not support modes (RISE, SHORT, LONG)
+      cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE_INVERSE)
+  { // Toggle does not support modes (RISE, SHORT, LONG)
     if (cluster->relay_mode != ZCL_ONOFF_CONFIGURATION_RELAY_MODE_DETACHED) {
       switch_cluster_relay_action_on(cluster);
     }
@@ -265,12 +265,11 @@ void switch_cluster_on_button_press(zigbee_switch_cluster *cluster) {
 void switch_cluster_on_button_release(zigbee_switch_cluster *cluster) {
   if (cluster->multistate_state == MULTISTATE_BOTH_PRESS ||
       cluster->multistate_state == MULTISTATE_BOTH_HOLD ||
-      cluster->multistate_state == MULTISTATE_BOTH_RELEASE) return; // never
+      cluster->multistate_state == MULTISTATE_BOTH_RELEASE) return; // never but avoid
 
   if (cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE ||
       cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE_INVERSE)
-  {
-    // Toggle does not support modes (RISE, SHORT, LONG)
+  { // Toggle does not support modes (RISE, SHORT, LONG)
     if (cluster->relay_mode != ZCL_ONOFF_CONFIGURATION_RELAY_MODE_DETACHED) {
        switch_cluster_relay_action_off(cluster);
     }
@@ -296,7 +295,7 @@ void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster) {
       cluster->button->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_MODE_TOGGLE_INVERSE) return;
   if (cluster->multistate_state == MULTISTATE_BOTH_PRESS ||
       cluster->multistate_state == MULTISTATE_BOTH_HOLD ||
-      cluster->multistate_state == MULTISTATE_BOTH_RELEASE) return; // never
+      cluster->multistate_state == MULTISTATE_BOTH_RELEASE) return; // never but avoid
 
   if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_LONG) {
     switch_cluster_relay_action_on(cluster);
