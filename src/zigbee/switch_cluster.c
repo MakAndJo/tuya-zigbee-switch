@@ -67,23 +67,23 @@ void switch_cluster_add_to_endpoint(zigbee_switch_cluster *cluster, zigbee_endpo
 
   // Configuration
   zigbee_endpoint_add_cluster(endpoint, 1, ZCL_CLUSTER_GEN_ON_OFF_SWITCH_CONFIG);
-  zcl_specClusterInfo_t *info_conf = zigbee_endpoint_reserve_info(endpoint);
-  info_conf->clusterId           = ZCL_CLUSTER_GEN_ON_OFF_SWITCH_CONFIG;
-  info_conf->manuCode            = MANUFACTURER_CODE_NONE;
-  info_conf->attrNum             = ZCL_ATTR_COUNT;
-  info_conf->attrTbl             = cluster->attr_infos;
-  info_conf->clusterRegisterFunc = zcl_onoff_configuration_register;
-  info_conf->clusterAppCb        = switch_cluster_callback_trampoline;
+  zcl_specClusterInfo_t *info_conf        = zigbee_endpoint_reserve_info(endpoint);
+  info_conf->clusterId                    = ZCL_CLUSTER_GEN_ON_OFF_SWITCH_CONFIG;
+  info_conf->manuCode                     = MANUFACTURER_CODE_NONE;
+  info_conf->attrNum                      = ZCL_ATTR_COUNT;
+  info_conf->attrTbl                      = cluster->attr_infos;
+  info_conf->clusterRegisterFunc          = zcl_onoff_configuration_register;
+  info_conf->clusterAppCb                 = switch_cluster_callback_trampoline;
 
   // Output ON OFF to bind to other devices
   zigbee_endpoint_add_cluster(endpoint, 0, ZCL_CLUSTER_GEN_ON_OFF);
-  zcl_specClusterInfo_t *info = zigbee_endpoint_reserve_info(endpoint);
-  info->clusterId           = ZCL_CLUSTER_GEN_ON_OFF;
-  info->manuCode            = MANUFACTURER_CODE_NONE;
-  info->attrNum             = 0;
-  info->attrTbl             = NULL;
-  info->clusterRegisterFunc = zcl_onOff_register;
-  info->clusterAppCb        = switch_cluster_callback_trampoline;
+  zcl_specClusterInfo_t *info             = zigbee_endpoint_reserve_info(endpoint);
+  info->clusterId                         = ZCL_CLUSTER_GEN_ON_OFF;
+  info->manuCode                          = MANUFACTURER_CODE_NONE;
+  info->attrNum                           = 0;
+  info->attrTbl                           = NULL;
+  info->clusterRegisterFunc               = zcl_onOff_register;
+  info->clusterAppCb                      = switch_cluster_callback_trampoline;
 
   SETUP_ATTR_FOR_TABLE(cluster->multistate_attr_infos, 0, ZCL_ATTRID_MULTISTATE_INPUT_NUMBER_OF_STATES, ZCL_DATA_TYPE_UINT16, ACCESS_CONTROL_READ, multistate_num_of_states);
   SETUP_ATTR_FOR_TABLE(cluster->multistate_attr_infos, 1, ZCL_ATTRID_MULTISTATE_INPUT_OUT_OF_SERVICE, ZCL_DATA_TYPE_BOOLEAN, ACCESS_CONTROL_READ, multistate_out_of_service);
@@ -92,13 +92,23 @@ void switch_cluster_add_to_endpoint(zigbee_switch_cluster *cluster, zigbee_endpo
 
   // Output
   zigbee_endpoint_add_cluster(endpoint, 1, ZCL_CLUSTER_GEN_MULTISTATE_INPUT_BASIC);
-  zcl_specClusterInfo_t *info_multistate = zigbee_endpoint_reserve_info(endpoint);
-  info_multistate->clusterId           = ZCL_CLUSTER_GEN_MULTISTATE_INPUT_BASIC;
-  info_multistate->manuCode            = MANUFACTURER_CODE_NONE;
-  info_multistate->attrNum             = 4;
-  info_multistate->attrTbl             = cluster->multistate_attr_infos;
-  info_multistate->clusterRegisterFunc = zcl_multistate_input_register;
-  info_multistate->clusterAppCb        = NULL;
+  zcl_specClusterInfo_t *info_multistate  = zigbee_endpoint_reserve_info(endpoint);
+  info_multistate->clusterId              = ZCL_CLUSTER_GEN_MULTISTATE_INPUT_BASIC;
+  info_multistate->manuCode               = MANUFACTURER_CODE_NONE;
+  info_multistate->attrNum                = 4;
+  info_multistate->attrTbl                = cluster->multistate_attr_infos;
+  info_multistate->clusterRegisterFunc    = zcl_multistate_input_register;
+  info_multistate->clusterAppCb           = NULL;
+
+  // Output Level for other devices
+  zigbee_endpoint_add_cluster(endpoint, 0, ZCL_CLUSTER_GEN_LEVEL_CONTROL);
+  zcl_specClusterInfo_t *info_level       = zigbee_endpoint_reserve_info(endpoint);
+  info_level->clusterId                   = ZCL_CLUSTER_GEN_LEVEL_CONTROL;
+  info_level->manuCode                    = MANUFACTURER_CODE_NONE;
+  info_level->attrNum                     = 0;
+  info_level->attrTbl                     = NULL;
+  info_level->clusterRegisterFunc         = zcl_level_register;
+  info_level->clusterAppCb                = switch_cluster_callback_trampoline;
 }
 
 /// --- RELAY ACTIONS --- ///
