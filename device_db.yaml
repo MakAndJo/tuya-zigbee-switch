@@ -1,4 +1,19 @@
+TS0011:
+  human_name: Tuya 1-gang L-only
+  neutral: without
+  device_type: end_device
+  tuya_manufacturer_name: _TZ3000_ji4araar
+  stock_converter_model: TS0011_switch_module
+  config_str: ji4araar;TS0011-custom;BA0f;LD7;SC2f;RC0;
+  old_manufacturer_names:
+  - Tuya-TS0011-custom
+  old_zb_models: null
+  tuya_manufacturer_id: 4417
+  tuya_image_type: 54179
+  firmware_image_type: 43524
+  status: Supported
 TS0012:
+  human_name: Tuya 2-gang L-only
   config_str: jl7qyupf;TS0012-custom;BA0f;LD7;SC2f;SC3f;RC0;RB4;
   device_type: end_device
   tuya_manufacturer_id: 4417
@@ -12,5 +27,4 @@ TS0012:
   old_manufacturer_names:
   - Tuya-CUSTOM   # Old name from early firmware
   - Tuya-TS0012-custom
-  human_name: GIRIER TS0012, OXT
   status: Supported
