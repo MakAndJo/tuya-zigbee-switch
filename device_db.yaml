@@ -27,7 +27,7 @@ TS0012:
   - Tuya-CUSTOM   # Old name from early firmware
   - Tuya-TS0012-custom
   status: Supported
-GIRIER_TS0001:
+TS0001:
   human_name: Girier 1-gang
   device_type: router
   tuya_model_name: TS0001
