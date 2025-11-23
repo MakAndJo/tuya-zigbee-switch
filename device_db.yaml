@@ -31,16 +31,14 @@ GIRIER_TS0001:
   human_name: Girier 1-gang
   device_type: router
   tuya_model_name: TS0001
-  tuya_manufacturer_name: _TZ3000_tqlv4ug4
-  stock_converter_manufacturer: Tuya
-  stock_converter_model: TS0001_switch_module
+  tuya_manufacturer_name: _TZ3210_tqlv4ug4
   override_z2m_device: null
   zb_module: ZT3L
   config_str: tqlv4ug4;TS0001-custom;BD2u;LC0;SB4u;RC2;
   alt_config_str: null
   old_manufacturer_names:
   - Tuya-TS0001-custom
-  - _TZ3210_tqlv4ug4
+  - _TZ3000_tqlv4ug4
   old_zb_models: null
   tuya_manufacturer_id: 4417
   tuya_image_type: 54179
