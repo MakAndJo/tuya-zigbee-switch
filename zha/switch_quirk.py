@@ -135,6 +135,7 @@ class CustomMultistateInputCluster(CustomCluster, MultistateInput):
 CONFIGS = [
     "ji4araar;TS0011-custom;BA0f;LD7;SC2f;RC0;",
     "jl7qyupf;TS0012-custom;BA0f;LD7;SC2f;SC3f;RC0;RB4;",
+    "ltt60asa;TS0004-Avv;BB5u;LC1;SB4u;RC0;SD2u;RC4;SC3u;RD4;SC2u;RD7;",
 ]
 
 for config in CONFIGS:
