@@ -2,11 +2,11 @@
   {
     "fileName": "1141-aa04-ffffffff-tlc_switch-forced.zigbee",
     "fileVersion": 4294967295,
-    "fileSize": 133778,
-    "url": "https://github.com/MakAndJo/tuya-zigbee-switch/raw/b9d719090504d1112782fe731a3d484cc80824a0/bin/TS0011_END_DEVICE/1141-aa04-ffffffff-tlc_switch-forced.zigbee",
+    "fileSize": 133794,
+    "url": "https://github.com/MakAndJo/tuya-zigbee-switch/raw/refs/heads/main/bin/TS0011_END_DEVICE/1141-aa04-ffffffff-tlc_switch-forced.zigbee",
     "imageType": 43524,
     "manufacturerCode": 4417,
-    "sha512": "680425fe5d81ff2e96a8bb2328cfc9a767d18b62ad11040f74f1708ee65a2c66ee61aefe5e7a871bd83bcd1564563bea7ab01da60a1cc9ec7d236830a98ed6ef",
+    "sha512": "dce837dddcecc6d4c1bdd9badb4a58e66893b55f3a29f0870848a1eeb01a0a8e04d480a250e5f62dea7048f0413b121c6a7cb097ad11249a74cec8455c3effdd",
     "otaHeaderString": "Telink Zigbee OTA\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZ3000_ji4araar",
@@ -17,11 +17,11 @@
   {
     "fileName": "1141-aa01-ffffffff-tlc_switch-forced.zigbee",
     "fileVersion": 4294967295,
-    "fileSize": 133778,
-    "url": "https://github.com/MakAndJo/tuya-zigbee-switch/raw/b9d719090504d1112782fe731a3d484cc80824a0/bin/TS0012_END_DEVICE/1141-aa01-ffffffff-tlc_switch-forced.zigbee",
+    "fileSize": 133794,
+    "url": "https://github.com/MakAndJo/tuya-zigbee-switch/raw/refs/heads/main/bin/TS0012_END_DEVICE/1141-aa01-ffffffff-tlc_switch-forced.zigbee",
     "imageType": 43521,
     "manufacturerCode": 4417,
-    "sha512": "3568099f245e28df6688185a386cd7eddcf10b2b0476ca20f22ba32ccb0e141fdc89583f988addb0b7bcc039ed108b7bb4d6d90c7c7e70b16e109e24e4fa7981",
+    "sha512": "02f3ebdbb51925fe543dd896eccb7eaf35f0194ec5dd05a3d52c7ad0061dbdaf81d5a0792f74f480417df74ae4778e5db55992fc7df7542a7890a64cc3e6d028",
     "otaHeaderString": "Telink Zigbee OTA\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZ3000_jl7qyupf",
