@@ -37,11 +37,11 @@ TS0001:
   config_str: tqlv4ug4;TS0001-custom;BD2u;LC0;SB4u;RC2;
   alt_config_str: null
   old_manufacturer_names:
-  - Tuya-TS0001-custom
   - _TZ3000_tqlv4ug4
+  - Tuya-TS0001-custom
   old_zb_models: null
   tuya_manufacturer_id: 4417
-  tuya_image_type: 54179
+  tuya_image_type: 65535
   firmware_image_type: 43525
   status: Supported
 GIRIER_TS0002:
