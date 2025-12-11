@@ -137,6 +137,7 @@ CONFIGS = [
     "jl7qyupf;TS0012-custom;BA0f;LD7;SC2f;SC3f;RC0;RB4;", # 2-gang L
     "tqlv4ug4;TS0001-custom;BD2u;LC0;SB4u;RC2;", # 1-gang N
     "zmy4lslw;TS0002-GIR;BD2u;LC2;SB5u;RC4;SB4u;RC3;", # 2-gang N
+    "odzoiovu;TS0003-GR;BB1u;LD7;SC2u;RC0;SC3u;RB4;SD2u;RB5;", # 3-gang N
     "ltt60asa;TS0004-Avv;BB5u;LC1;SB4u;RC0;SD2u;RC4;SC3u;RD4;SC2u;RD7;", # 4-gang N
 ]
 
